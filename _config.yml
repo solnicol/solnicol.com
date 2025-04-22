@@ -1,0 +1,19 @@
+title: solnicol.com
+description: Sol Nicol’s digital home – exploring tech, systems, and timeless ideas
+baseurl: "" # leave empty for root
+url: "https://solnicol.com"
+markdown: kramdown
+permalink: pretty
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+defaults:
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "default"
