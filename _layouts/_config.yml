@@ -1,0 +1,6 @@
+title: "Sol Nicol"
+url: "https://now.solnicol.com"
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
