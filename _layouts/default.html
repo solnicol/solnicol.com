@@ -2,17 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ page.title }} – Sol Nicol</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/assets/style.css">
+
+  <!-- Primary Meta Tags -->
+  <title>Sol Nicol</title>
+  <meta name="title" content="Sol Nicol">
+  <meta name="description" content="Sol Nicol’s digital home. Creative futurist exploring Web3, AI, and digital knowledge systems.">
+  <link rel="canonical" href="https://solnicol.com/">
+
+  <!-- Open Graph / Facebook / Discord / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://solnicol.com/">
+  <meta property="og:title" content="Sol Nicol">
+  <meta property="og:description" content="Curious mind connecting dots across tech and timeless ideas.">
+  <meta property="og:image" content="https://solnicol.com/og.jpg">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://solnicol.com/">
+  <meta name="twitter:title" content="Sol Nicol">
+  <meta name="twitter:description" content="Curious mind connecting dots across tech and timeless ideas.">
+  <meta name="twitter:image" content="https://solnicol.com/og.jpg">
+  <meta name="twitter:site" content="@solnicol">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+
+
+  <!-- Font: Geist from Vercel -->
+  <link rel="preconnect" href="https://fonts.vercel.app">
+  <link href="https://fonts.vercel.app/css2?family=Geist&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Geist', sans-serif;
+      max-width: 768px;
+      margin: 4rem auto;
+      padding: 0 1rem;
+      line-height: 1.65;
+    }
+  </style>
 </head>
 <body>
-  <nav>
-    <a href="/">Home</a> •
-    <a href="/now">Now</a>
-  </nav>
-  <main>
-    {{ content }}
-  </main>
+  {{ content }}
 </body>
 </html>
