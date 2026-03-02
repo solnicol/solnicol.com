@@ -4,26 +4,24 @@ title: "Now"
 permalink: /now/
 ---
 
-🗓️ **Updated:** April 2025
+🗓️ **Updated:** March 2026
 
 ---
 
-Right now, I’m deliberately **not building anything big**. I’m in a phase of open-ended **exploration, tinkering, and learning in public**. No pressure to ship. Just making space for curiosity.
+After a phase of exploration, I am now focused on **active building and proof-of-work**. I am bridging institutional finance experience with agentic systems and decentralised finance.
 
-### ✍️ Current interests:
-- **Small software** – simple tools that do one thing beautifully
-- **Web fundamentals** – HTML/CSS/JS without abstraction
-- **Digital epistemology** – how knowledge is made, modelled, and shared online
-- **Writing to learn** – exploring ideas in public, not in private drafts
+### ✍️ What I'm doing now:
+- **Building ZIGGY** – My private agentic partner. We are currently stabilising the memory architecture and vault-sync infrastructure.
+- **Mapping DeFi** – Documenting and structuring the Scottish decentralised finance ecosystem in collaboration with Blockchain Scotland.
+- **Site Build** – Transitioning this site from a holding page to a live repository of builds and learnings.
 
 ### 🧪 Current experiments:
-- Publishing via GitHub Pages with Markdown + Jekyll
-- Playing with static site generators and digital gardens
-- Designing a personal knowledge workflow with Obsidian and git
+- **Semantic Retrieval** – Integrating QMD for local, privacy-first knowledge retrieval.
+- **Autonomous Loops** – Testing robust morning/evening bookends for workflow continuity.
 
 ### 🧭 Orientation:
-I’m more interested in **process over products** right now—more “what happens if…” than “what should I build?”
+I am focused on **shipping and stability**. The goal is to create a visible, auditable record of work that proves competence at the intersection of finance and frontier tech.
 
 ---
 
-This page evolves with me. It’s a timestamp, not a destination.
+This page reflects my current focus. It’s a timestamp, not a destination.
