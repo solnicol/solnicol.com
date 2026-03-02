@@ -28,5 +28,7 @@ title: Home
 <ul class="links">
   <li><a href="https://x.com/SolasETH">X/Twitter</a></li>
   <li><a href="https://github.com/solnicol">GitHub</a></li>
+  <li><a href="https://www.linkedin.com/in/solnicol/">LinkedIn</a></li>
+  <li><a href="mailto:solasnicol@gmail.com">Email</a></li>
   <li><a href="/now/">/now</a></li>
 </ul>
