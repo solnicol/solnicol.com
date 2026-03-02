@@ -508,11 +508,11 @@
   <div class="progress-ring" aria-hidden="true"></div>
   <div class="surface">
     <header class="site-header" aria-label="Site header">
-      {% if page.url != '/' and page.url != '/index.html' %}
+      {% unless page.url == '/' or page.url == '/index.html' %}
       <div class="wordmark-block">
         <a class="wordmark" href="{{ '/' | relative_url }}">Sol Nicol</a>
       </div>
-      {% endif %}
+      {% endunless %}
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="{{ '/' | relative_url }}">Home</a>
         <a href="{{ '/now/' | relative_url }}">Now</a>
