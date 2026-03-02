@@ -4,10 +4,17 @@ title: "Now"
 permalink: /now/
 ---
 
-<h3>Update: March 2026</h3>
+<div class="hero">
+  <img src="/assets/images/profile.png" alt="Sol Nicol" class="hero-photo" width="130" height="130" loading="lazy">
+  <div>
+    <p class="hero-kicker">Now — March 2026</p>
+    <p class="hero-name">Sol Nicol</p>
+    <p class="hero-intro">Focused on active build cycles: standing up ZIGGY’s memory spine, fixing the vault tunnel, and capturing proof-of-work for founders.</p>
+  </div>
+</div>
 
 <div class="bio">
-  After a phase of exploration, I am now focused on <strong>active building and proof-of-work</strong>. I am bridging institutional finance experience with agentic systems and decentralised finance.
+  After a phase of exploration, I am now focused on <strong>active building and proof-of-work</strong>. I’m bridging institutional finance experience with agentic systems and decentralised finance.
 </div>
 
 <h3>What I'm doing now</h3>

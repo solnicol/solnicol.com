@@ -3,10 +3,17 @@ layout: default
 title: Home
 ---
 
-# Sol Nicol
+<div class="hero">
+  <img src="/assets/images/profile.png" alt="Sol Nicol" class="hero-photo" width="130" height="130" loading="lazy">
+  <div>
+    <p class="hero-kicker">Builder &amp; engineer</p>
+    <p class="hero-name">Sol Nicol</p>
+    <p class="hero-intro">Fifteen years in institutional asset management at BlackRock and State Street; now proving the next decade through agentic infrastructure and decentralised finance.</p>
+  </div>
+</div>
 
 <div class="bio">
-  Fifteen years in institutional asset management at BlackRock and State Street. Currently building <strong>ZIGGY</strong>—a private agentic infrastructure—and mapping the decentralised finance landscape for <strong>Blockchain Scotland</strong>.
+  Building <strong>ZIGGY</strong>—a private agentic infrastructure—and mapping the decentralised finance landscape for <strong>Blockchain Scotland</strong>.
 </div>
 
 <h3>Active Builds</h3>
