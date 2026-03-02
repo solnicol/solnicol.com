@@ -11,7 +11,7 @@ og_image: /og.jpg
   <div>
     <p class="hero-kicker">Builder &amp; engineer</p>
     <p class="hero-name">Sol Nicol</p>
-    <p class="hero-intro">Fifteen years in institutional asset management at BlackRock and State Street; now proving the next decade through agentic infrastructure and decentralised finance.</p>
+    <p class="hero-intro">Fifteen years in institutional asset management at BlackRock and State Street. Currently building private agentic infrastructure and mapping the decentralised finance landscape for Blockchain Scotland.</p>
   </div>
 </div>
 

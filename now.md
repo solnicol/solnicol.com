@@ -12,7 +12,7 @@ og_image: /og.jpg
   <div>
     <p class="hero-kicker">Now — March 2026</p>
     <p class="hero-name">Sol Nicol</p>
-    <p class="hero-intro">Focused on active build cycles: standing up ZIGGY’s memory spine, fixing the vault tunnel, and capturing proof-of-work for founders.</p>
+    <p class="hero-intro">Fifteen years in institutional asset management at BlackRock and State Street. Currently building private agentic infrastructure and mapping the decentralised finance landscape for Blockchain Scotland.</p>
   </div>
 </div>
 
