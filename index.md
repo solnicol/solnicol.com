@@ -1,6 +1,9 @@
 ---
 layout: default
 title: Home
+og_title: "Sol Nicol — Builder & engineer"
+og_description: "Proving the next decade through ZIGGY, private agent infrastructure, and a DeFi proof-of-work cycle."
+og_image: /og.jpg
 ---
 
 <div class="hero">

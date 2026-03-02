@@ -2,6 +2,9 @@
 layout: default
 title: "Now"
 permalink: /now/
+og_title: "Sol Nicol — Now"
+og_description: "Active build loop: stabilising ZIGGY’s memory spine, fixing the vault tunnel, and mapping Scotland’s DeFi proof-of-work."
+og_image: /og.jpg
 ---
 
 <div class="hero">
