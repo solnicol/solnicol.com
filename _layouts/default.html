@@ -32,11 +32,15 @@
 
   <style>
     :root {
-      --bg: #0a0a0a;
-      --text: #e5e5e5;
-      --text-dim: #888;
-      --accent: #fff;
-      --border: #222;
+      --bg-0: #000;
+      --bg-1: #0a0a0a;
+      --bg-2: #111;
+      --fg-0: #f5f5f5;
+      --fg-1: #d4d4d4;
+      --fg-2: #8a8a8a;
+      --accent: #ffffff;
+      --border-soft: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.16);
       --font-main: 'Geist', sans-serif;
       --font-mono: 'Geist Mono', monospace;
     }
@@ -48,123 +52,371 @@
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.05), transparent 40%), linear-gradient(130deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+      color: var(--fg-0);
       font-family: var(--font-main);
+      font-feature-settings: "ss01" 1, "liga" 1;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
-      padding: 4rem 2rem;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-
-    header {
-      margin-bottom: 4rem;
-    }
-
-    h1 {
-      font-size: 1rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 2rem;
-      color: var(--text-dim);
-    }
-
-    .bio {
-      font-size: 1.25rem;
-      font-weight: 400;
-      letter-spacing: -0.01em;
-      line-height: 1.4;
-      margin-bottom: 3rem;
-      color: var(--text);
-    }
-
-    .bio strong {
-      font-weight: 500;
-      color: var(--accent);
-    }
-
-    hr {
-      border: 0;
-      border-top: 1px solid var(--border);
-      margin: 3rem 0;
-    }
-
-    h3 {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-bottom: 1.5rem;
-      color: var(--text-dim);
-    }
-
-    .build-item {
-      margin-bottom: 2rem;
-    }
-
-    .build-item strong {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      color: var(--accent);
-    }
-
-    .build-item p {
-      color: var(--text-dim);
-      font-size: 0.95rem;
-    }
-
-    ul.links {
-      list-style: none;
+      padding: clamp(1.5rem, 4vw, 3rem);
       display: flex;
-      gap: 1.5rem;
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02) 1px, transparent 1px, transparent 32px), repeating-linear-gradient(90deg, rgba(255,255,255,0.015), rgba(255,255,255,0.015) 1px, transparent 1px, transparent 48px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .surface {
+      width: min(960px, calc(100vw - 3rem));
+      background: linear-gradient(165deg, #040404, #0d0d0d 60%, #000);
+      border: 1px solid var(--border-strong);
+      padding: clamp(2rem, 5vw, 3.5rem);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      position: relative;
+      isolation: isolate;
+      z-index: 1;
+    }
+
+    .surface::after {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border: 1px solid var(--border-soft);
+      pointer-events: none;
+      opacity: 0.45;
     }
 
     a {
       color: inherit;
       text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.2s ease, color 0.2s ease;
+      letter-spacing: -0.015em;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      transition: color 0.25s ease;
+    }
+
+    a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+      opacity: 0.85;
     }
 
     a:hover {
       color: var(--accent);
-      border-bottom-color: var(--accent);
+    }
+
+    a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .site-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem;
+      border-bottom: 1px solid var(--border-soft);
+      padding-bottom: 1.75rem;
+      position: relative;
+    }
+
+    .site-header::before {
+      content: "";
+      position: absolute;
+      top: -1.25rem;
+      left: 0;
+      width: 64px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    .wordmark-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      color: var(--fg-2);
+    }
+
+    .wordmark {
+      font-size: clamp(2.1rem, 4vw, 2.9rem);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      position: relative;
+      padding-bottom: 0.3rem;
+    }
+
+    .wordmark::after {
+      display: none;
+    }
+
+    .descriptor {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--fg-2);
+    }
+
+    .site-nav {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: flex-end;
+    }
+
+    .site-nav a {
+      padding-bottom: 0.4rem;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 2.25rem;
+    }
+
+    .content h1,
+    .content h2 {
+      display: none; /* Hide redundant markdown headers */
+    }
+
+    .bio {
+      font-size: clamp(1.2rem, 3.6vw, 1.55rem);
+      line-height: 1.45;
+      letter-spacing: -0.015em;
+      color: var(--fg-1);
+      max-width: 60ch;
+    }
+
+    .bio strong {
+      font-weight: 550;
+      color: var(--accent);
+    }
+
+    h3 {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--fg-2);
+    }
+
+    hr {
+      border: none;
+      background: var(--border-soft);
+      height: 1px;
+      width: 100%;
+      margin: 0.5rem 0 -0.5rem;
+    }
+
+    .build-item {
+      border-top: 1px solid var(--border-soft);
+      padding-top: 1.35rem;
+    }
+
+    .build-item strong {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      color: var(--fg-0);
+      margin-bottom: 0.4rem;
+    }
+
+    .build-item p {
+      color: var(--fg-2);
+      font-size: 0.97rem;
+      line-height: 1.6;
+      max-width: 60ch;
+    }
+
+    ul.links {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    ul.links li {
+      position: relative;
     }
 
     .metadata {
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      margin-top: 4rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      border-top: 1px solid var(--border-strong);
+      padding-top: 1.75rem;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 1.25rem;
+      font-family: var(--font-mono);
     }
 
-    /* Jekyll content override */
-    .content h1, .content h2 { display: none; } /* Hide redundant headers from markdown */
-    
-    @media (max-width: 480px) {
-      body { padding: 3rem 1.5rem; }
-      .bio { font-size: 1.1rem; }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem 1.5rem;
+    }
+
+    .meta-pair {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .meta-pair.align-right {
+      text-align: right;
+    }
+
+    .meta-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--fg-2);
+    }
+
+    .meta-value {
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+      color: var(--fg-1);
+    }
+
+    .meta-value::after {
+      display: none;
+    }
+
+    .metadata a.meta-value {
+      color: var(--fg-0);
+    }
+
+    .metadata a.meta-value::after {
+      bottom: -3px;
+    }
+
+    .micro-footer {
+      border-top: 1px solid var(--border-soft);
+      padding-top: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--fg-2);
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: #050505;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 1.25rem;
+      }
+
+      .surface {
+        width: 100%;
+        padding: clamp(1.5rem, 6vw, 2.5rem);
+      }
+
+      .site-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .site-nav {
+        justify-content: flex-start;
+      }
+
+      .meta-pair.align-right {
+        text-align: left;
+      }
+
+      .micro-footer {
+        flex-direction: column;
+        gap: 0.4rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="content">
-    {{ content }}
-  </div>
-  
-  <div class="metadata">
-    <span>© 2026 Sol Nicol</span>
-    <span>Edinburgh, Scotland</span>
+  <div class="surface">
+    <header class="site-header" aria-label="Site header">
+      <div class="wordmark-block">
+        <p class="eyebrow">Institutional build program</p>
+        <a class="wordmark" href="{{ '/' | relative_url }}">Sol Nicol</a>
+        <p class="descriptor">BlackRock discipline · Seoul-Tech energy</p>
+      </div>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="{{ '/' | relative_url }}">Home</a>
+        <a href="{{ '/now/' | relative_url }}">Now</a>
+        <a href="https://t.me/solnicol" target="_blank" rel="noopener">Telegram</a>
+        <a href="mailto:sol@solnicol.com">Email</a>
+      </nav>
+    </header>
+
+    <main class="content">
+      {{ content }}
+    </main>
+
+    <footer class="metadata" aria-label="Site metadata">
+      <div class="meta-grid">
+        <div class="meta-pair">
+          <span class="meta-label">Base</span>
+          <span class="meta-value">Edinburgh, Scotland</span>
+        </div>
+        <div class="meta-pair">
+          <span class="meta-label">Cycle</span>
+          <span class="meta-value">{{ site.time | date: "%b %Y" }}</span>
+        </div>
+        <div class="meta-pair">
+          <span class="meta-label">Status</span>
+          <span class="meta-value">Active build mode</span>
+        </div>
+        <div class="meta-pair align-right">
+          <span class="meta-label">Contact</span>
+          <a class="meta-value" href="mailto:sol@solnicol.com">sol@solnicol.com</a>
+        </div>
+      </div>
+      <div class="micro-footer">
+        <span>© 2026 Sol Nicol</span>
+        <span>Institutional precision × Creative polish</span>
+      </div>
+    </footer>
   </div>
 </body>
 </html>
