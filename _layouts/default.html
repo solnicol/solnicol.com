@@ -242,8 +242,23 @@
     }
 
     .build-item {
-      border-top: 1px solid var(--border-soft);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+      width: 100%;
       padding-top: 1.35rem;
+    }
+
+    .build-item::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border-soft);
     }
 
     .build-item strong {
@@ -252,7 +267,8 @@
       font-weight: 500;
       letter-spacing: -0.015em;
       color: var(--fg-0);
-      margin-bottom: 0.4rem;
+      margin: 0;
+      max-width: 60ch;
     }
 
     .build-item p {
@@ -260,6 +276,8 @@
       font-size: 0.97rem;
       line-height: 1.6;
       max-width: 60ch;
+      margin: 0;
+      text-indent: 0;
     }
 
     ul.links {
