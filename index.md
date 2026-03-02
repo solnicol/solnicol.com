@@ -5,19 +5,28 @@ title: Home
 
 # Sol Nicol
 
-**Fifteen years in institutional asset management at BlackRock and State Street. Currently building ZIGGY—a private agentic infrastructure—and mapping the decentralised finance landscape for Blockchain Scotland.**
+<div class="bio">
+  Fifteen years in institutional asset management at BlackRock and State Street. Currently building <strong>ZIGGY</strong>—a private agentic infrastructure—and mapping the decentralised finance landscape for <strong>Blockchain Scotland</strong>.
+</div>
 
----
+<hr>
 
-### Active Builds
+<h3>Active Builds</h3>
 
-**ZIGGY v1**  
-A private agentic infrastructure for knowledge work. Built on OpenClaw. Focus: long-term memory, semantic retrieval, and autonomous workflow management.
+<div class="build-item">
+  <strong>ZIGGY v1</strong>
+  <p>A private agentic infrastructure for knowledge work. Built on OpenClaw. Focus: long-term memory, semantic retrieval, and autonomous workflow management.</p>
+</div>
 
-**DeFi Ecosystem Mapping**  
-Structuring and preserving knowledge for Blockchain Scotland. Mapping the intersection of traditional finance and decentralised protocols.
+<div class="build-item">
+  <strong>DeFi Ecosystem Mapping</strong>
+  <p>Structuring and preserving knowledge for Blockchain Scotland. Mapping the intersection of traditional finance and decentralised protocols.</p>
+</div>
 
----
+<hr>
 
-### Elsewhere
-[X/Twitter](https://x.com/SolasETH) | [GitHub](https://github.com/solnicol) | [/now](/now/)
+<ul class="links">
+  <li><a href="https://x.com/SolasETH">X/Twitter</a></li>
+  <li><a href="https://github.com/solnicol">GitHub</a></li>
+  <li><a href="/now/">/now</a></li>
+</ul>
