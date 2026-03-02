@@ -228,37 +228,50 @@
     h3 {
       font-family: var(--font-mono);
       font-size: 0.78rem;
-      letter-spacing: 0.35em;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
       color: var(--fg-2);
+      display: inline-flex;
+      gap: 0.5ch;
+      align-items: center;
+      margin-top: clamp(1.8rem, 3vw, 2.4rem);
+      margin-bottom: 0.45rem;
     }
 
-    hr {
-      border: none;
-      background: var(--border-soft);
-      height: 1px;
-      width: 100%;
-      margin: 0.5rem 0 -0.5rem;
+    .bio + h3 {
+      margin-top: clamp(2.2rem, 4vw, 3rem);
+    }
+
+    .build-list {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      border-top: 1px solid var(--border-soft);
+      margin-top: 0.35rem;
+      padding-top: 0.75rem;
+      gap: 0;
+    }
+
+    .build-list + h3 {
+      margin-top: clamp(2rem, 4vw, 2.75rem);
     }
 
     .build-item {
-      position: relative;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 0.4rem;
+      gap: 0.35rem;
       width: 100%;
-      padding-top: 1.35rem;
+      padding: 0.85rem 0 1rem;
     }
 
-    .build-item::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--border-soft);
+    .build-item + .build-item {
+      border-top: 1px solid var(--border-soft);
+      padding-top: 1.1rem;
+    }
+
+    .build-item:last-child {
+      padding-bottom: 0.35rem;
     }
 
     .build-item strong {
@@ -269,15 +282,15 @@
       color: var(--fg-0);
       margin: 0;
       max-width: 60ch;
+      line-height: 1.35;
     }
 
     .build-item p {
       color: var(--fg-2);
       font-size: 0.97rem;
-      line-height: 1.6;
+      line-height: 1.45;
       max-width: 60ch;
       margin: 0;
-      text-indent: 0;
     }
 
     ul.links {
