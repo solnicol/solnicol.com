@@ -4,6 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ page.title }} | Sol Nicol</title>
+  {% assign page_title = page.title | default: site.title %}
+  {% assign og_title = page.og_title | default: page_title %}
+  {% assign og_description = page.og_description | default: site.description %}
+  {% assign canonical_url = page.url | absolute_url %}
+  {% assign og_image_path = page.og_image | default: site.og_image %}
+  {% assign og_image_url = og_image_path | absolute_url %}
+
+  <link rel="canonical" href="{{ canonical_url }}">
+  <meta name="description" content="{{ og_description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ canonical_url }}">
+  <meta property="og:title" content="{{ og_title }}">
+  <meta property="og:description" content="{{ og_description }}">
+  <meta property="og:image" content="{{ og_image_url }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ og_title }}">
+  <meta name="twitter:description" content="{{ og_description }}">
+  <meta name="twitter:image" content="{{ og_image_url }}">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
