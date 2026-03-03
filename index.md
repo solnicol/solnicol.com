@@ -9,7 +9,6 @@ og_image: /og.jpg
 {% assign home = site.data.home %}
 
 <div class="hero">
-  <img src="/assets/images/profile.png" alt="Sol Nicol" class="hero-photo" width="130" height="130" loading="lazy">
   <div>
     <p class="hero-kicker">{{ home.hero.kicker }}</p>
     <p class="hero-name">{{ home.hero.name }}</p>

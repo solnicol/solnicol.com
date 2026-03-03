@@ -10,7 +10,6 @@ og_image: /og.jpg
 {% assign now = site.data.now %}
 
 <div class="hero">
-  <img src="/assets/images/profile.png" alt="Sol Nicol" class="hero-photo" width="130" height="130" loading="lazy">
   <div>
     <p class="hero-kicker">{{ now.hero.kicker }}</p>
     <p class="hero-name">{{ now.hero.name }}</p>

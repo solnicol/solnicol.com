@@ -281,30 +281,10 @@
     }
 
     .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 120px) 1fr;
-      gap: clamp(1rem, 4vw, 1.75rem);
-      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
       margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
-    }
-
-    .hero-photo {
-      width: clamp(100px, 12vw, 130px);
-      height: clamp(100px, 12vw, 130px);
-      border-radius: 38% 62% 40% 60% / 50% 32% 68% 50%;
-      object-fit: cover;
-      filter: saturate(1.05) drop-shadow(0 20px 45px rgba(0, 0, 0, 0.65));
-      view-transition-name: sol-portrait;
-      animation: float linear both;
-      animation-timeline: scroll(root block);
-      animation-range: entry 0% exit 60%;
-    }
-
-    @keyframes float {
-      to {
-        transform: translateY(-8%) scale(0.94);
-        opacity: 0.9;
-      }
     }
 
     .hero-kicker {
@@ -489,10 +469,6 @@
       .surface {
         width: 100%;
         padding: clamp(1.5rem, 6vw, 2.5rem);
-      }
-
-      .hero {
-        grid-template-columns: 1fr;
       }
 
       .site-header {
