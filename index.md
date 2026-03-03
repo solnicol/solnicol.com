@@ -3,8 +3,6 @@ layout: default
 title: Home
 ---
 
-# Sol Nicol
-
 <div class="bio">
   Fifteen years in institutional asset management at BlackRock and State Street. Currently building <strong>ZIGGY</strong>—a private agentic infrastructure—and mapping the decentralised finance landscape for <strong>Blockchain Scotland</strong>.
 </div>
