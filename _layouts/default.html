@@ -31,10 +31,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap" rel="stylesheet">
 
   <style>
-    @view-transition {
-      navigation: auto;
-    }
-
     :root {
       --bg-0: #000;
       --bg-1: #0a0a0a;
@@ -47,7 +43,6 @@
       --border-strong: rgba(255, 255, 255, 0.16);
       --font-main: 'Geist', sans-serif;
       --font-mono: 'Geist Mono', monospace;
-      --headline-weight: 520;
     }
 
     * {
@@ -100,39 +95,6 @@
       border: 1px solid var(--border-soft);
       pointer-events: none;
       opacity: 0.45;
-    }
-
-    .progress-ring {
-      position: fixed;
-      top: 1.5rem;
-      left: 1.5rem;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      border: 1px solid var(--border-soft);
-      display: grid;
-      place-items: center;
-      z-index: 10;
-      pointer-events: none;
-      background: rgba(5, 5, 5, 0.6);
-      backdrop-filter: blur(18px);
-    }
-
-    .progress-ring::before {
-      content: "";
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: conic-gradient(var(--accent) 0%, transparent 0%);
-      animation: ring-fill linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0% 100%;
-    }
-
-    @keyframes ring-fill {
-      to {
-        background: conic-gradient(var(--accent) 100%, transparent 0%);
-      }
     }
 
     a {
@@ -261,58 +223,6 @@
     .bio strong {
       font-weight: 550;
       color: var(--accent);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 120px) 1fr;
-      gap: clamp(1rem, 4vw, 1.75rem);
-      align-items: center;
-      margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
-    }
-
-    .hero-photo {
-      width: clamp(100px, 12vw, 130px);
-      height: clamp(100px, 12vw, 130px);
-      border-radius: 38% 62% 40% 60% / 50% 32% 68% 50%;
-      object-fit: cover;
-      filter: saturate(1.05) drop-shadow(0 20px 45px rgba(0, 0, 0, 0.65));
-      view-transition-name: sol-portrait;
-      animation: float linear both;
-      animation-timeline: scroll(root block);
-      animation-range: entry 0% exit 60%;
-    }
-
-    @keyframes float {
-      to {
-        transform: translateY(-8%) scale(0.94);
-        opacity: 0.9;
-      }
-    }
-
-    .hero-kicker {
-      font-family: var(--font-mono);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.4em;
-      color: var(--fg-2);
-      margin-bottom: 0.4rem;
-    }
-
-    .hero-name {
-      font-size: clamp(2.3rem, 5vw, 3.4rem);
-      letter-spacing: -0.03em;
-      line-height: 1.05;
-      font-weight: 600;
-      font-variation-settings: "wght" var(--headline-weight);
-      transition: font-variation-settings 0.25s ease;
-    }
-
-    .hero-intro {
-      color: var(--fg-2);
-      font-size: 1rem;
-      margin-top: 0.4rem;
-      max-width: 54ch;
     }
 
     h3 {
@@ -474,10 +384,6 @@
         padding: clamp(1.5rem, 6vw, 2.5rem);
       }
 
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
       .site-header {
         flex-direction: column;
         align-items: flex-start;
@@ -496,23 +402,14 @@
         gap: 0.4rem;
       }
     }
-
-    @media (max-width: 420px) {
-      .progress-ring {
-        display: none;
-      }
-    }
   </style>
 </head>
 <body>
-  <div class="progress-ring" aria-hidden="true"></div>
   <div class="surface">
     <header class="site-header" aria-label="Site header">
-      {% unless page.url == '/' or page.url == '/index.html' or page.url == '/now/' %}
       <div class="wordmark-block">
         <a class="wordmark" href="{{ '/' | relative_url }}">Sol Nicol</a>
       </div>
-      {% endunless %}
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="{{ '/' | relative_url }}">Home</a>
         <a href="{{ '/now/' | relative_url }}">Now</a>
@@ -547,16 +444,5 @@
       </div>
     </footer>
   </div>
-
-  <script>
-    (() => {
-      const root = document.documentElement;
-      const updateWeight = (x) => {
-        const weight = 480 + (x / window.innerWidth) * 220;
-        root.style.setProperty('--headline-weight', weight.toFixed(0));
-      };
-      window.addEventListener('pointermove', (event) => updateWeight(event.clientX));
-    })();
-  </script>
 </body>
 </html>

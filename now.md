@@ -2,22 +2,12 @@
 layout: default
 title: "Now"
 permalink: /now/
-og_title: "Sol Nicol — Now"
-og_description: "Active build loop: stabilising ZIGGY’s memory spine, fixing the vault tunnel, and mapping Scotland’s DeFi proof-of-work."
-og_image: /og.jpg
 ---
 
-<div class="hero">
-  <img src="/assets/images/profile.png" alt="Sol Nicol" class="hero-photo" width="130" height="130" loading="lazy">
-  <div>
-    <p class="hero-kicker">Now — March 2026</p>
-    <p class="hero-name">Sol Nicol</p>
-    <p class="hero-intro">Fifteen years in institutional asset management at BlackRock and State Street. Currently building private agentic infrastructure and mapping the decentralised finance landscape for Blockchain Scotland.</p>
-  </div>
-</div>
+<h3>Update: March 2026</h3>
 
 <div class="bio">
-  After a phase of exploration, I am now focused on <strong>active building and proof-of-work</strong>. I’m bridging institutional finance experience with agentic systems and decentralised finance.
+  After a phase of exploration, I am now focused on <strong>active building and proof-of-work</strong>. I am bridging institutional finance experience with agentic systems and decentralised finance.
 </div>
 
 <h3>What I'm doing now</h3>
