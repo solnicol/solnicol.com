@@ -6,33 +6,38 @@ og_description: "Proving the next decade through ZIGGY, private agent infrastruc
 og_image: /og.jpg
 ---
 
-{% assign home = site.data.home %}
-
 <div class="hero">
+  <img src="/assets/images/profile.png" alt="Sol Nicol" class="hero-photo" width="130" height="130" loading="lazy">
   <div>
-    <p class="hero-kicker">{{ home.hero.kicker }}</p>
-    <p class="hero-name">{{ home.hero.name }}</p>
-    <p class="hero-intro">{{ home.hero.intro }}</p>
+    <p class="hero-kicker">Builder &amp; engineer</p>
+    <p class="hero-name">Sol Nicol</p>
+    <p class="hero-intro">Fifteen years in institutional asset management at BlackRock and State Street. Currently building private agentic infrastructure and mapping the decentralised finance landscape for Blockchain Scotland.</p>
   </div>
 </div>
 
 <div class="bio">
-  {{ home.bio | markdownify | remove: '<p>' | remove: '</p>' }}
+  Building <strong>ZIGGY</strong>—a private agentic infrastructure—and mapping the decentralised finance landscape for <strong>Blockchain Scotland</strong>.
 </div>
 
 <h3>Active Builds</h3>
 
 <div class="build-list">
-  {% for item in home.builds %}
-    <div class="build-item">
-      <strong>{{ item.title }}</strong>
-      <p>{{ item.description }}</p>
-    </div>
-  {% endfor %}
+  <div class="build-item">
+    <strong>ZIGGY v1</strong>
+    <p>A private agentic infrastructure for knowledge work. Built on OpenClaw. Focus: long-term memory, semantic retrieval, and autonomous workflow management.</p>
+  </div>
+
+  <div class="build-item">
+    <strong>DeFi Ecosystem Mapping</strong>
+    <p>Structuring and preserving knowledge for Blockchain Scotland. Mapping the intersection of traditional finance and decentralised protocols.</p>
+  </div>
 </div>
 
 <ul class="links">
-  {% for link in home.links %}
-    <li><a href="{{ link.url }}">{{ link.label }}</a></li>
-  {% endfor %}
+  <li><a href="https://x.com/SolasETH">X/Twitter</a></li>
+  <li><a href="https://github.com/solnicol">GitHub</a></li>
+  <li><a href="https://www.linkedin.com/in/solnicol/">LinkedIn</a></li>
+  <li><a href="https://t.me/solnicol">Telegram</a></li>
+  <li><a href="mailto:sol@solnicol.com">Email</a></li>
+  <li><a href="/now/">/now</a></li>
 </ul>
