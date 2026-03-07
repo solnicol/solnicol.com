@@ -4,12 +4,12 @@ hero:
   intro: "Fifteen years in institutional asset management at BlackRock and State Street. Currently building private agentic infrastructure and mapping the decentralised finance landscape for Blockchain Scotland."
 bio: "Now focused on execution and proof-of-work, bridging institutional finance experience with agentic systems and decentralised finance."
 doing:
-  - title: "Building ZIGGY"
-    description: "Stabilising the memory architecture, vault-sync infrastructure, and QMD ingestion."
-  - title: "Mapping DeFi"
-    description: "Documenting and structuring the Scottish decentralised finance ecosystem with Blockchain Scotland."
-  - title: "Site Build"
-    description: "Transitioning this site from a holding page to a live repository of builds and learnings."
+  - title: "Agentic Infrastructure"
+    description: "Architecting ZIGGY's memory-first OS: bridging Obsidian vaults, local semantic search, and autonomous cron-loops."
+  - title: "Building solnicol.com"
+    description: "Developing a monochrome, high-performance lab environment for public builds and private experiment deployment."
+  - title: "DeFi Research"
+    description: "Mapping the Scottish decentralised finance ecosystem in collaboration with Blockchain Scotland."
 experiments:
   - title: "Semantic Retrieval"
     description: "Integrating QMD for local, privacy-first knowledge retrieval."
