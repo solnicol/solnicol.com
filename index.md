@@ -2,22 +2,14 @@
 layout: default
 title: Home
 og_title: "Sol Nicol — Builder & engineer"
-og_description: "Proving the next decade through ZIGGY, private agent infrastructure, and a DeFi proof-of-work cycle."
+og_description: "Fifteen years in institutional asset management. Currently building private agentic infrastructure and mapping the decentralised finance landscape for Blockchain Scotland."
 og_image: /og.jpg
 ---
 
 {% assign home = site.data.home %}
 
-<div class="hero">
-  <div>
-    <p class="hero-kicker">{{ home.hero.kicker }}</p>
-    <p class="hero-name">{{ home.hero.name }}</p>
-    <p class="hero-intro">{{ home.hero.intro }}</p>
-  </div>
-</div>
-
 <div class="bio">
-  {{ home.bio | markdownify | remove: '<p>' | remove: '</p>' }}
+  {{ home.hero.intro | markdownify | remove: '<p>' | remove: '</p>' }}
 </div>
 
 <h3>Active Builds</h3>
