@@ -45,7 +45,7 @@ permalink: /now/
 
 <ul class="links">
   <li><a href="/">Back</a></li>
-  <li><a href="https://x.com/SolasETH">X/Twitter</a></li>
+  <li><a href="https://x.com/solnicol_">X/Twitter</a></li>
   <li><a href="https://github.com/solnicol">GitHub</a></li>
   <li><a href="https://www.linkedin.com/in/solnicol/">LinkedIn</a></li>
   <li><a href="https://t.me/solnicol">Telegram</a></li>
