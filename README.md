@@ -1,9 +1,23 @@
 # solnicol.com
-My personal site + /now page – built with HTML, Markdown, or Jekyll
+My personal site, built with Astro and Markdown content collections.
 
 ## Content workflow
 
-- Homepage copy lives in `_data/home.yml`
-- `/now` copy lives in `_data/now.yml`
+- Page routes live in `src/pages`
+- Project pages live in `src/content/projects/*.md`
+- Project frontmatter is typed in `src/content.config.ts`
+- The shared site frame lives in `src/layouts/SiteLayout.astro`
 
-Update those YAML files (hero text, bios, build blurbs, links) and run `bundle exec jekyll build` before committing. Avoid editing `index.md` or `now.md` directly for text changes—they just render the data.
+Project frontmatter follows this shape:
+
+```yaml
+title: Horologium Quintarum
+label: Temperament Clock
+thesis: A clock that lets you hear why pure fifths do not close.
+liveUrl: https://temperament-clock.vercel.app
+repoUrl: https://github.com/solnicol/temperament-clock
+year: 2026
+tags: [music, web audio, interaction]
+```
+
+Run `npm run build` before committing.

@@ -1,0 +1,44 @@
+---
+import { getCollection, render } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({
+    params: { slug: project.id.replace(/\.mdx?$/, "") },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<SiteLayout title={project.data.title} description={project.data.ogDescription ?? project.data.thesis}>
+  <article class="project-page">
+    <header class="project-hero">
+      <p class="project-label">{project.data.label}</p>
+      <h1>{project.data.title}</h1>
+      <p class="project-thesis">{project.data.thesis}</p>
+      <div class="project-links" aria-label="Project links">
+        {project.data.liveUrl && <a href={project.data.liveUrl}>Live artefact</a>}
+        {project.data.repoUrl && <a href={project.data.repoUrl}>Repository</a>}
+      </div>
+    </header>
+
+    <dl class="project-facts">
+      <div>
+        <dt>Year</dt>
+        <dd>{project.data.year}</dd>
+      </div>
+      <div>
+        <dt>Tags</dt>
+        <dd>{project.data.tags.join(" / ")}</dd>
+      </div>
+    </dl>
+
+    <div class="project-body">
+      <Content />
+    </div>
+  </article>
+</SiteLayout>

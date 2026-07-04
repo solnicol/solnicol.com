@@ -1,0 +1,24 @@
+---
+import { getCollection } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const projects = (await getCollection("projects")).sort((a, b) => b.data.year - a.data.year);
+const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
+---
+
+<SiteLayout title="Projects" description="Finished artefacts and working experiments by Sol Nicol.">
+  <div class="bio">
+    Finished artefacts and working experiments, held together by the questions they were built to answer.
+  </div>
+
+  <h3>Projects</h3>
+
+  <div class="build-list">
+    {projects.map((project) => (
+      <div class="build-item">
+        <strong><a href={`/projects/${projectSlug(project.id)}/`}>{project.data.title}</a></strong>
+        <p>{project.data.thesis}</p>
+      </div>
+    ))}
+  </div>
+</SiteLayout>
