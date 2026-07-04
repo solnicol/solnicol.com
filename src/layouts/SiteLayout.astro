@@ -379,12 +379,42 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
   .project-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.8rem 1.3rem;
+    gap: 0.75rem;
     font-family: var(--font-mono);
-    font-size: 0.76rem;
-    letter-spacing: 0.18em;
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-top: 0.25rem;
+    margin-top: 0.45rem;
+  }
+
+  .project-links a {
+    min-height: 2.5rem;
+    border: 1px solid oklch(0.94 0.17 190 / 0.56);
+    background:
+      linear-gradient(135deg, oklch(0.94 0.17 190 / 0.16), oklch(0.91 0.19 310 / 0.08)),
+      oklch(0.11 0.012 255 / 0.84);
+    color: var(--fg-0);
+    padding: 0.72rem 0.9rem;
+    box-shadow: 0 0 0 1px oklch(0.94 0.17 190 / 0.08), 0 10px 30px oklch(0.94 0.17 190 / 0.08);
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .project-links a::before {
+    content: "->";
+    letter-spacing: 0;
+    color: oklch(0.94 0.17 190);
+  }
+
+  .project-links a::after {
+    display: none;
+  }
+
+  .project-links a:hover {
+    border-color: oklch(0.92 0.18 78 / 0.78);
+    background:
+      linear-gradient(135deg, oklch(0.94 0.17 190 / 0.22), oklch(0.92 0.18 78 / 0.14)),
+      oklch(0.15 0.018 255 / 0.92);
+    transform: translateY(-1px);
   }
 
   .project-facts {
@@ -430,6 +460,23 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
   .project-body strong {
     color: var(--fg-0);
     font-weight: 550;
+  }
+
+  .project-body a {
+    color: oklch(0.94 0.17 190);
+    text-decoration: underline;
+    text-decoration-color: oklch(0.94 0.17 190 / 0.58);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  .project-body a::after {
+    display: none;
+  }
+
+  .project-body a:hover {
+    color: oklch(0.92 0.18 78);
+    text-decoration-color: oklch(0.92 0.18 78 / 0.74);
   }
 
   .metadata {
