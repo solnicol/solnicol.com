@@ -12,6 +12,7 @@ const {
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://solnicol.com");
 const pageTitle = title === "Home" ? "Sol Nicol" : `${title} | Sol Nicol`;
 const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
+const isHome = title === "Home";
 ---
 
 <!doctype html>
@@ -38,8 +39,8 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap" rel="stylesheet" />
   </head>
-  <body>
-    <div class="surface">
+  <body class:list={[{ "home-page": isHome }]}>
+    <div class:list={["surface", { "home-surface": isHome }]}>
       <header class="site-header" aria-label="Site header">
         <div class="wordmark-block">
           <a class="wordmark" href="/">Sol Nicol</a>
