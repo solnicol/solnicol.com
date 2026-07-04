@@ -41,4 +41,4 @@ Interactive explanation works best when it lets the concept push back. The usefu
 Pythagorean tuning, equal temperament, frequency ratios, musical perception, circular interfaces.
 
 **Built with**  
-Web Audio, React, TypeScript, and Vercel.
+Web Audio, React, Vite, and Vercel.
