@@ -23,9 +23,9 @@ That gap is where temperament enters. The clock turns the theory into a navigabl
 
 ### The Artefact
 
-The live artefact stays separate from this site: [temperament-clock.vercel.app](https://temperament-clock.vercel.app).
+You can open the clock at [temperament-clock.vercel.app](https://temperament-clock.vercel.app).
 
-This page is the frame around it: the question, the structure, and the record of what the build taught me.
+It is meant to be used more than read. Step through the fifths, listen for the drift, and watch the circle reveal the small error that temperament has to place somewhere.
 
 ### What It Shows
 
