@@ -1,26 +1,44 @@
 ---
 title: Horologium Quintarum
 label: Temperament Clock
-thesis: A circle that does not close.
+thesis: The circle that almost closes.
 liveUrl: https://temperament-clock.vercel.app
 repoUrl: https://github.com/solnicol/temperament-clock
 year: 2026
 tags: [music, web audio, interaction]
-ogDescription: A small web audio sketch for hearing why twelve pure fifths do not close.
+ogDescription: A small experiment for hearing the gap where the circle of fifths almost closes.
 ---
 
-## Context
+## Intro
 
-Twelve pure 3:2 fifths almost return to the starting pitch class, but not quite. They overshoot seven octaves by the Pythagorean comma.
+The circle of fifths looks complete.
 
-## Interaction
+Twelve steps. Twelve notes. One clean loop.
 
-The sketch turns that gap into something visible and audible: a cycle that appears closed, but structurally fails to close. The interface keeps the theory small enough to play with, using the circle as both diagram and instrument.
+But if each step is a pure 3:2 fifth, the loop doesn't land exactly where it started. It overshoots seven octaves by a tiny amount called the Pythagorean comma.
 
-## Implementation
+That tiny gap is the whole problem.
 
-Built as a small web audio experiment, with the visual system and pitch relationships sharing the same underlying structure rather than being treated as separate layers.
+## What it does
 
-## Reflection
+This is a small experiment for hearing that gap.
 
-The useful constraint was restraint. The project works best when the interface gives the listener just enough structure to notice the mismatch, then gets out of the way.
+Move around the clock one fifth at a time. Each step sounds fine on its own. Then the error starts to build.
+
+Your eye sees a circle.
+
+Your ear hears the drift.
+
+## Why it exists
+
+The circle of fifths is useful, but it's too neat.
+
+It hides the compromise underneath tuning. You can have pure fifths, clean octaves, and a closed twelve note cycle.
+
+But not all at once.
+
+This clock isolates that failure point and lets you hear it.
+
+The circle almost closes.
+
+Almost is the interesting part.
