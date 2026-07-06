@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import SiteLayout from "../../layouts/SiteLayout.astro";
+import TemperamentClock from "../../components/temperament-clock/TemperamentClock.jsx";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const slug = project.id.replace(/\.mdx?$/, "");
 ---
 
 <SiteLayout title={project.data.title} description={project.data.ogDescription ?? project.data.thesis}>
@@ -25,6 +27,16 @@ const { Content } = await render(project);
         {project.data.repoUrl && <a href={project.data.repoUrl}>Source</a>}
       </div>
     </header>
+
+    {slug === "temperament-clock" && (
+      <figure class="project-embed">
+        <TemperamentClock embedded client:only="react" />
+        <figcaption class="project-embed-label">
+          <span>Fig. 01 — Horologium Quintarum</span>
+          <span>Live instrument · sound on</span>
+        </figcaption>
+      </figure>
+    )}
 
     <div class="project-body">
       <Content />

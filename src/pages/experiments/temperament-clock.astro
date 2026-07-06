@@ -1,0 +1,60 @@
+---
+import TemperamentClock from "../../components/temperament-clock/TemperamentClock.jsx";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temperament Clock | Sol Nicol</title>
+    <meta
+      name="description"
+      content="A clock whose hours are the circle of fifths. Twelve pure fifths overshoot seven octaves — hear and see the Pythagorean comma."
+    />
+    <link rel="canonical" href={new URL("/experiments/temperament-clock/", Astro.site)} />
+    <meta name="theme-color" content="#0e0e0f" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body>
+    <a class="back" href="/projects/temperament-clock/">&gt;_ notes</a>
+    <TemperamentClock client:only="react" />
+  </body>
+</html>
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: oklch(0.164 0.002 286.2);
+  }
+
+  .back {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: oklch(0.524 0.006 95.2);
+    text-decoration: none;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid transparent;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+
+  .back:hover,
+  .back:focus-visible {
+    color: oklch(0.925 0.007 88.6);
+    border-color: oklch(0.349 0.003 286.2);
+    outline: none;
+  }
+</style>

@@ -378,6 +378,40 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     transform: translateY(-1px);
   }
 
+  .project-embed {
+    position: relative;
+    border: 1px solid var(--border-soft);
+    margin: 0;
+    padding-top: 1.5rem;
+  }
+
+  .project-embed::before {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-top: 1px solid var(--border-strong);
+    border-right: 1px solid var(--border-strong);
+    content: "";
+    opacity: 0.78;
+  }
+
+  .project-embed-label {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 450;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+    padding: 0.55rem 0.75rem;
+    border-top: 1px solid var(--border-soft);
+  }
+
   .project-body {
     display: flex;
     flex-direction: column;
