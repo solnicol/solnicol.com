@@ -372,33 +372,6 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     transform: translateY(-1px);
   }
 
-  .project-facts {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border-soft);
-    padding-bottom: 1.5rem;
-    font-family: var(--font-mono);
-  }
-
-  .project-facts div {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .project-facts dt {
-    color: var(--fg-2);
-    font-size: 0.62rem;
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
-  }
-
-  .project-facts dd {
-    color: var(--fg-1);
-    font-size: 0.9rem;
-  }
-
   .project-body {
     display: flex;
     flex-direction: column;
