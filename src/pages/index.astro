@@ -156,10 +156,22 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
   }
 
   .glyph-code {
-    color: var(--accent);
+    /* Signal at display size renders as leaf — the material, not the
+       flat tone. color stands in where background-clip is unsupported. */
+    color: var(--signal);
+    background: linear-gradient(
+      135deg,
+      oklch(55% 0.12 72) 0%,
+      oklch(75% 0.14 82) 25%,
+      oklch(92% 0.08 88) 50%,
+      oklch(70% 0.15 80) 75%,
+      oklch(48% 0.13 70) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     font-variant-numeric: tabular-nums;
     opacity: 0;
-    text-shadow: 0 0 26px oklch(0.3785 0.1954 263.23 / 0.28);
     transform: rotateX(74deg) translateY(0.035em);
   }
 

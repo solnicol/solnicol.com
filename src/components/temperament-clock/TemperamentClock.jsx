@@ -36,20 +36,32 @@ const THEMES = {
     faint: "oklch(0.286 0.004 286.2)",
     bg: "oklch(0.164 0.002 286.2)",
     btnBorder: "oklch(0.349 0.003 286.2)",
+    glowPure: "oklch(0.85 0.152 90)",
+    beatLo: "oklch(0.62 0.1 89.7)",
+    beatHi: "oklch(0.88 0.16 90)",
+    dotLo: "oklch(0.6 0.11 89.7)",
+    dotHi: "oklch(0.8 0.15 90)",
   },
   blueprint: {
-    brass: "oklch(0.82 0.14 90)",
+    brass: "var(--signal, oklch(0.8 0.08 97))",
     ink: "var(--fg-0, oklch(0.985 0.003 260))",
     dim: "var(--fg-2, oklch(0.76 0.018 260))",
     faint: "oklch(1 0 0 / 0.22)",
     bg: "var(--ikb, oklch(0.3785 0.1954 263.23))",
     btnBorder: "var(--border-strong, oklch(1 0 0 / 0.36))",
+    glowPure: "oklch(0.87 0.09 96)",
+    beatLo: "oklch(0.66 0.06 97)",
+    beatHi: "oklch(0.9 0.1 96)",
+    dotLo: "oklch(0.64 0.07 97)",
+    dotHi: "oklch(0.84 0.09 96)",
   },
 };
 
 export default function TemperamentClock({ embedded = false }) {
-  const { brass: BRASS, ink: INK, dim: DIM, faint: FAINT, bg: BG, btnBorder: BTN_BORDER } =
-    THEMES[embedded ? "blueprint" : "dark"];
+  const {
+    brass: BRASS, ink: INK, dim: DIM, faint: FAINT, bg: BG, btnBorder: BTN_BORDER,
+    glowPure: GLOW_PURE, beatLo: BEAT_LO, beatHi: BEAT_HI, dotLo: DOT_LO, dotHi: DOT_HI,
+  } = THEMES[embedded ? "blueprint" : "dark"];
   const [now, setNow] = useState(() => new Date());
   const [activeIdx, setActiveIdx] = useState(null);   // face position (mod 12)
   const [activeStep, setActiveStep] = useState(null); // absolute chain step (0–12)
@@ -320,18 +332,18 @@ export default function TemperamentClock({ embedded = false }) {
         /* 1. The tempered fifth beats at ${BEAT_HZ.toFixed(3)} Hz — the glow's
               L and C oscillate at exactly that computed period. The pure
               fifth holds still: locked sound, locked light. */
-        .dyad-pure { fill: oklch(0.85 0.152 90); }
+        .dyad-pure { fill: ${GLOW_PURE}; }
         .dyad-tempered { animation: beatGlow ${BEAT_PERIOD_S.toFixed(3)}s ease-in-out infinite; }
         @keyframes beatGlow {
-          0%, 100% { fill: oklch(0.62 0.1 89.7); }
-          50% { fill: oklch(0.88 0.16 90); }
+          0%, 100% { fill: ${BEAT_LO}; }
+          50% { fill: ${BEAT_HI}; }
         }
 
         /* 2. The hour marker breathes slowly — L rises and settles. */
         .hour-dot { animation: breathe 4s ease-in-out infinite; }
         @keyframes breathe {
-          0%, 100% { fill: oklch(0.6 0.11 89.7); }
-          50% { fill: oklch(0.8 0.15 90); }
+          0%, 100% { fill: ${DOT_LO}; }
+          50% { fill: ${DOT_HI}; }
         }
 
         .sec-sweep {
@@ -344,7 +356,7 @@ export default function TemperamentClock({ embedded = false }) {
         @media (prefers-reduced-motion: reduce) {
           .ring-pulse, .struck, .dyad-tempered, .hour-dot, .sec-sweep { animation: none; }
           .ring-pulse { opacity: 0; }
-          .dyad-tempered { fill: oklch(0.85 0.152 90); }
+          .dyad-tempered { fill: ${GLOW_PURE}; }
         }
 
         .btn {
