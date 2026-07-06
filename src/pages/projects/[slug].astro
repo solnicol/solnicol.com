@@ -21,8 +21,8 @@ const { Content } = await render(project);
       <h1>{project.data.title}</h1>
       <p class="project-thesis">{project.data.thesis}</p>
       <div class="project-links" aria-label="Project links">
-        {project.data.liveUrl && <a href={project.data.liveUrl}>Live artefact</a>}
-        {project.data.repoUrl && <a href={project.data.repoUrl}>Repository</a>}
+        {project.data.liveUrl && <a href={project.data.liveUrl}>Enter</a>}
+        {project.data.repoUrl && <a href={project.data.repoUrl}>Source</a>}
       </div>
     </header>
 

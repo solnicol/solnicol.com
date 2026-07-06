@@ -1,327 +1,113 @@
 ---
+import { getCollection } from "astro:content";
 import SiteLayout from "../layouts/SiteLayout.astro";
+
+const projects = (await getCollection("projects")).sort((a, b) => b.data.year - a.data.year);
+const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
 ---
 
 <SiteLayout title="Home">
-  <section class="home-hero" aria-labelledby="home-title">
-    <div class="home-title-block">
-      <p class="home-kicker">Edinburgh / systems / capital / agents</p>
-      <h1 id="home-title">Sol Nicol</h1>
-    </div>
+  <div class="hero">
+    <h1>
+      <span class="hero-line">Sol</span>
+      <span class="hero-line">Nicol</span>
+    </h1>
+    <p class="tagline">Visual experiments in design and code.</p>
+  </div>
 
-    <p class="bio home-bio">
-      Fifteen years in institutional asset management at BlackRock and State Street. Currently building <strong>ZIGGY</strong> - a private agentic infrastructure - and mapping the decentralised finance landscape for <strong>Blockchain Scotland</strong>.
-    </p>
-  </section>
+  <h3 id="experiments">Experiments</h3>
 
-  <section class="home-builds" aria-labelledby="active-builds">
-    <div class="section-heading">
-      <span>01</span>
-      <h2 id="active-builds">Active Builds</h2>
-    </div>
-
-    <div class="build-list home-build-list">
-      <article class="build-item home-build-item">
-        <div class="build-index">01</div>
-        <div>
-          <strong>ZIGGY v1</strong>
-          <p>A private agentic infrastructure for knowledge work. Built on OpenClaw. Focus: long-term memory, semantic retrieval, and autonomous workflow management.</p>
+  <div class="experiment-list">
+    {projects.map((project, i) => (
+      <div class="experiment">
+        <span class="experiment-index">{String(i + 1).padStart(2, "0")}</span>
+        <div class="experiment-main">
+          <strong>{project.data.label}</strong>
+          <p>{project.data.thesis}</p>
+          <div class="experiment-links">
+            {project.data.liveUrl && <a href={project.data.liveUrl}>Enter</a>}
+            <a href={`/projects/${projectSlug(project.id)}/`}>Read</a>
+          </div>
         </div>
-      </article>
+      </div>
+    ))}
+  </div>
 
-      <article class="build-item home-build-item">
-        <div class="build-index">02</div>
-        <div>
-          <strong>DeFi Ecosystem Mapping</strong>
-          <p>Structuring and preserving knowledge for Blockchain Scotland. Mapping the intersection of traditional finance and decentralised protocols.</p>
-        </div>
-      </article>
-    </div>
-  </section>
+  <h3 id="contact">Contact</h3>
 
-  <nav class="home-link-field" aria-label="Selected links">
-    <span class="link-field-label">Index</span>
-    <ul class="links home-links">
-      <li><a href="/projects/">Projects</a></li>
-      <li><a href="/notes/">Notes</a></li>
-      <li><a href="/photographs/">Photographs</a></li>
-      <li><a href="/archive/">Archive</a></li>
-      <li><a href="/work/">Work</a></li>
-      <li><a href="/contact/">Contact</a></li>
-      <li><a href="https://x.com/solnicol_">X/Twitter</a></li>
-      <li><a href="https://github.com/solnicol">GitHub</a></li>
-      <li><a href="https://www.linkedin.com/in/solnicol/">LinkedIn</a></li>
-      <li><a href="https://t.me/solnicol">Telegram</a></li>
-      <li><a href="mailto:sol@solnicol.com">Email</a></li>
-      <li><a href="/now/">/now</a></li>
-    </ul>
-  </nav>
+  <ul class="links">
+    <li><a href="mailto:sol@solnicol.com">sol@solnicol.com</a></li>
+    <li><a href="https://www.linkedin.com/in/solnicol/">LinkedIn</a></li>
+    <li><a href="https://github.com/solnicol">GitHub</a></li>
+  </ul>
 </SiteLayout>
 
-<style is:global>
-  body.home-page {
-    background:
-      radial-gradient(circle at 15% 8%, oklch(0.72 0.12 184 / 0.12), transparent 27rem),
-      radial-gradient(circle at 82% 18%, oklch(0.82 0.12 78 / 0.08), transparent 24rem),
-      linear-gradient(135deg, #030404, #090a0a 45%, #020202);
-    align-items: stretch;
-    padding: clamp(1.25rem, 3.4vw, 3rem);
+<style>
+  .hero {
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 2.25rem;
   }
 
-  body.home-page::before {
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, transparent calc(50% - 1px), rgba(255, 255, 255, 0.05) calc(50% - 1px), rgba(255, 255, 255, 0.05) calc(50% + 1px), transparent calc(50% + 1px));
-    background-size: 40px 40px, 40px 40px, 100% 100%;
-    mask-image: linear-gradient(to bottom, black 0%, black 78%, transparent 100%);
-  }
-
-  body.home-page .home-surface {
-    width: min(1180px, 100%);
-    min-height: calc(100vh - clamp(2.5rem, 6.8vw, 6rem));
-    margin: 0 auto;
-    background:
-      linear-gradient(90deg, rgba(255, 255, 255, 0.055), transparent 16%, transparent 84%, rgba(255, 255, 255, 0.045)),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.026), transparent 42%),
-      transparent;
-    border: 0;
-    box-shadow: none;
-    padding: clamp(1.35rem, 4.2vw, 3rem) clamp(1.25rem, 5vw, 4.8rem);
-    gap: clamp(2rem, 5.5vw, 4.75rem);
-  }
-
-  body.home-page .home-surface::after {
-    inset: 0;
-    border-color: rgba(255, 255, 255, 0.12);
-    opacity: 0.72;
-  }
-
-  body.home-page .site-header {
-    border-bottom-color: rgba(255, 255, 255, 0.11);
-    padding-bottom: clamp(1rem, 2.6vw, 1.75rem);
-  }
-
-  body.home-page .site-header::before {
-    width: 92px;
-    background: linear-gradient(90deg, oklch(0.88 0.12 184), oklch(0.86 0.11 78 / 0.2), transparent);
-  }
-
-  body.home-page .wordmark {
-    font-size: 0.74rem;
-    font-family: var(--font-mono);
-    font-weight: 500;
-    letter-spacing: 0.28em;
-    color: oklch(0.86 0.02 210 / 0.78);
-  }
-
-  body.home-page .site-nav {
-    color: oklch(0.88 0.02 210 / 0.78);
-    letter-spacing: 0.16em;
-    gap: clamp(0.8rem, 2vw, 1.35rem);
-  }
-
-  body.home-page .content {
-    gap: clamp(2.2rem, 5.4vw, 4.5rem);
-  }
-
-  .home-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(20rem, 0.72fr);
-    gap: clamp(2rem, 6vw, 5rem);
-    align-items: end;
-    padding-top: clamp(0.5rem, 4vw, 3.5rem);
-  }
-
-  .home-title-block {
+  .hero h1 {
     display: flex;
     flex-direction: column;
-    gap: clamp(1rem, 2vw, 1.35rem);
-  }
-
-  .home-kicker {
-    width: fit-content;
-    border-top: 1px solid oklch(0.86 0.11 78 / 0.52);
-    padding-top: 0.8rem;
-    color: oklch(0.78 0.04 210 / 0.78);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.22em;
-    line-height: 1.6;
+    font-size: clamp(3.2rem, 11vw, 6.5rem);
+    font-weight: 600;
+    letter-spacing: -0.045em;
     text-transform: uppercase;
+    line-height: 0.92;
+    margin-bottom: 1.5rem;
   }
 
-  .home-title-block h1 {
-    color: oklch(0.97 0.018 93);
-    font-size: clamp(4.4rem, 15vw, 11.5rem);
-    font-weight: 640;
-    letter-spacing: -0.075em;
-    line-height: 0.8;
-    text-transform: uppercase;
-    text-wrap: balance;
+  .tagline {
+    font-size: clamp(1.2rem, 3.6vw, 1.55rem);
+    line-height: 1.45;
+    letter-spacing: -0.015em;
+    color: var(--fg-1);
+    max-width: 60ch;
   }
 
-  .home-bio {
-    max-width: 33rem;
-    margin-bottom: 0.2rem;
-    padding-left: clamp(1rem, 3vw, 2rem);
-    border-left: 1px solid oklch(0.86 0.02 210 / 0.18);
-    color: oklch(0.86 0.018 210 / 0.86);
-    font-size: clamp(1.08rem, 2.1vw, 1.35rem);
-    line-height: 1.5;
-  }
-
-  .home-bio strong {
-    color: oklch(0.98 0.02 93);
-    font-weight: 620;
-  }
-
-  .home-builds {
-    display: grid;
-    grid-template-columns: minmax(8rem, 0.28fr) minmax(0, 1fr);
-    gap: clamp(1.5rem, 4vw, 3.5rem);
-    align-items: start;
-  }
-
-  .section-heading {
+  .experiment {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    position: sticky;
-    top: 2rem;
+    gap: 1.1rem;
+    padding: 2.25rem 0 2.5rem;
   }
 
-  .section-heading span,
-  .build-index,
-  .link-field-label {
-    color: oklch(0.72 0.11 184 / 0.74);
+  .experiment-index {
     font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.26em;
+    font-size: 0.75rem;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
+    color: var(--fg-2);
   }
 
-  .section-heading h2 {
-    color: oklch(0.76 0.025 210 / 0.74);
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
-    font-weight: 500;
-    letter-spacing: 0.36em;
-    line-height: 1.6;
-    text-transform: uppercase;
+  .experiment-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
   }
 
-  body.home-page .home-build-list {
-    border-top-color: rgba(255, 255, 255, 0.16);
-    padding-top: 0;
+  .experiment-main strong {
+    font-size: clamp(1.65rem, 4.2vw, 2.3rem);
+    font-weight: 550;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--fg-0);
   }
 
-  body.home-page .home-build-item {
-    display: grid;
-    grid-template-columns: 4rem minmax(0, 1fr);
-    gap: clamp(1rem, 3vw, 2rem);
-    padding: clamp(1.2rem, 3vw, 2rem) 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.095);
+  .experiment-main p {
+    color: var(--fg-1);
+    font-size: 1rem;
+    line-height: 1.55;
+    max-width: 52ch;
   }
 
-  body.home-page .home-build-item + .home-build-item {
-    border-top: 0;
-    padding-top: clamp(1.2rem, 3vw, 2rem);
-  }
-
-  body.home-page .home-build-item strong {
-    color: oklch(0.97 0.015 93);
-    font-size: clamp(1.15rem, 2.2vw, 1.55rem);
-    font-weight: 560;
-  }
-
-  body.home-page .home-build-item p {
-    max-width: 52rem;
-    color: oklch(0.73 0.018 210 / 0.82);
-    font-size: clamp(0.98rem, 1.6vw, 1.08rem);
-    line-height: 1.62;
-  }
-
-  .home-link-field {
-    display: grid;
-    grid-template-columns: minmax(8rem, 0.28fr) minmax(0, 1fr);
-    gap: clamp(1.5rem, 4vw, 3.5rem);
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.11);
-    padding: clamp(1rem, 2.4vw, 1.35rem) 0;
-  }
-
-  body.home-page .home-links {
-    gap: 0.85rem clamp(1rem, 2.6vw, 1.7rem);
-    align-items: center;
-    color: oklch(0.88 0.02 210 / 0.82);
-    font-size: 0.72rem;
-    letter-spacing: 0.16em;
-  }
-
-  body.home-page .home-links a::before {
-    content: "/";
-    color: oklch(0.86 0.11 78 / 0.72);
-    margin-right: 0.12rem;
-  }
-
-  body.home-page .metadata {
-    border-top: 0;
-    padding-top: 0;
-  }
-
-  body.home-page .meta-grid {
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    padding-top: clamp(1rem, 2.4vw, 1.3rem);
-  }
-
-  body.home-page .meta-value {
-    color: oklch(0.86 0.018 210 / 0.82);
-  }
-
-  @media (max-width: 840px) {
-    body.home-page .home-surface {
-      min-height: auto;
-    }
-
-    .home-hero,
-    .home-builds,
-    .home-link-field {
-      grid-template-columns: 1fr;
-    }
-
-    .home-bio {
-      padding-left: 1rem;
-    }
-
-    .section-heading {
-      position: static;
-      flex-direction: row;
-      align-items: center;
-    }
-
-    body.home-page .home-build-item {
-      grid-template-columns: 2.5rem minmax(0, 1fr);
-    }
-  }
-
-  @media (max-width: 520px) {
-    body.home-page {
-      padding: 0.85rem;
-    }
-
-    body.home-page .home-surface {
-      padding: 1rem;
-    }
-
-    .home-title-block h1 {
-      font-size: clamp(3.35rem, 22vw, 5rem);
-      letter-spacing: -0.07em;
-    }
-
-    body.home-page .home-build-item {
-      grid-template-columns: 1fr;
-      gap: 0.7rem;
-    }
+  .experiment-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    color: var(--fg-2);
   }
 </style>
