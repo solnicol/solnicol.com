@@ -1,6 +1,6 @@
 ---
-title: Horologium Quintarum
-label: Temperament Clock
+title: Temperament Clock
+label: Horologium Quintarum
 thesis: The circle that almost closes.
 liveUrl: https://temperament-clock.vercel.app
 repoUrl: https://github.com/solnicol/temperament-clock
