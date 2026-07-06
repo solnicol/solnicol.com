@@ -67,15 +67,22 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
 
 <style is:global>
   :root {
-    --bg-0: #000;
-    --bg-1: #0a0a0a;
-    --bg-2: #111;
-    --fg-0: #f5f5f5;
-    --fg-1: #f5f5f5;
-    --fg-2: #9c9c9c;
-    --accent: #fff;
-    --border-soft: rgba(255, 255, 255, 0.07);
-    --border-strong: rgba(255, 255, 255, 0.16);
+    --bg-0: oklch(0.055 0.005 260);
+    --bg-1: oklch(0.085 0.006 260);
+    --bg-2: oklch(0.13 0.008 260);
+    --fg-0: oklch(0.965 0.004 260);
+    --fg-1: oklch(0.84 0.006 260);
+    --fg-2: oklch(0.62 0.011 260);
+    --fg-3: oklch(0.42 0.012 260);
+    --accent: oklch(0.76 0.145 164);
+    --accent-soft: oklch(0.76 0.145 164 / 0.18);
+    --border-soft: oklch(1 0 0 / 0.075);
+    --border-strong: oklch(1 0 0 / 0.16);
+    --shadow-soft: oklch(0 0 0 / 0.42);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --duration-fast: 160ms;
+    --duration-med: 220ms;
     --font-main: "Geist", sans-serif;
     --font-mono: "Geist Mono", monospace;
   }
@@ -94,6 +101,8 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     font-feature-settings: "ss01" 1, "liga" 1;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
     padding: clamp(1.5rem, 4vw, 3rem);
     display: flex;
     align-items: flex-start;
@@ -105,18 +114,31 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     padding: clamp(1rem, 3vw, 2rem);
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 2rem;
   }
 
   a {
     color: inherit;
-    text-decoration: none;
-    letter-spacing: -0.015em;
+    text-decoration-color: transparent;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      text-decoration-color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
   }
 
   a:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
+    text-decoration-color: currentColor;
+  }
+
+  a:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 0.35rem;
+    text-decoration-color: transparent;
   }
 
   .site-header {
@@ -125,7 +147,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     align-items: flex-start;
     justify-content: space-between;
     gap: 1.5rem;
-    padding-bottom: clamp(3rem, 8vw, 5rem);
+    padding-bottom: clamp(2rem, 5vw, 3.5rem);
   }
 
   .site-mark {
@@ -135,7 +157,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     font-size: 14px;
     letter-spacing: 0.04em;
     line-height: 1.15;
-    color: rgba(245, 245, 245, 0.62);
+    color: var(--fg-2);
   }
 
   .site-mark:hover {
@@ -155,20 +177,44 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
   }
 
   .site-nav a {
+    position: relative;
     padding-bottom: 0.4rem;
+    text-decoration: none;
+  }
+
+  .site-nav a::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: var(--accent);
+    content: "";
+    opacity: 0;
+    transform: scaleX(0.25);
+    transform-origin: left;
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .site-nav a:hover::after,
+  .site-nav a:focus-visible::after {
+    opacity: 1;
+    transform: scaleX(1);
   }
 
   .content {
     display: flex;
     flex-direction: column;
-    gap: 2.25rem;
+    gap: 1.8rem;
   }
 
   h3 {
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--fg-2);
-    margin-top: clamp(1.8rem, 3vw, 2.4rem);
+    margin-top: clamp(1.25rem, 2vw, 1.75rem);
     margin-bottom: 0.45rem;
   }
 
@@ -205,18 +251,18 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
 
   .project-hero h1 {
     color: var(--fg-0);
-    font-size: clamp(2.2rem, 6vw, 4.4rem);
+    font-size: 4.1rem;
     font-weight: 600;
-    letter-spacing: -0.04em;
+    letter-spacing: 0;
     line-height: 0.98;
     max-width: 10ch;
   }
 
   .project-thesis {
     color: var(--fg-1);
-    font-size: clamp(1.2rem, 3vw, 1.55rem);
+    font-size: 1.45rem;
     line-height: 1.35;
-    letter-spacing: -0.015em;
+    letter-spacing: 0;
     max-width: 46ch;
   }
 
@@ -235,11 +281,13 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     border: 1px solid var(--border-strong);
     color: var(--fg-0);
     padding: 0.6rem 0.9rem;
+    text-decoration: none;
   }
 
   .project-links a:hover {
-    text-decoration: none;
-    border-color: var(--fg-2);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    transform: translateY(-1px);
   }
 
   .project-facts {
@@ -282,6 +330,15 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     max-width: 64ch;
   }
 
+  .project-body h2 {
+    color: var(--fg-0);
+    font-size: 1rem;
+    font-weight: 560;
+    line-height: 1.3;
+    margin-top: 1.2rem;
+    max-width: 64ch;
+  }
+
   .project-body strong {
     color: var(--fg-0);
     font-weight: 550;
@@ -318,7 +375,28 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
 
   ::selection {
     background: var(--accent);
-    color: #050505;
+    color: var(--bg-0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 1ms !important;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .project-hero h1 {
+      font-size: 3.2rem;
+    }
+
+    .project-thesis {
+      font-size: 1.25rem;
+    }
   }
 
   @media (max-width: 720px) {
@@ -338,6 +416,10 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
 
     .site-nav {
       justify-content: flex-start;
+    }
+
+    .project-hero h1 {
+      font-size: 2.35rem;
     }
   }
 </style>
