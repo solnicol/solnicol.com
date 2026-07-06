@@ -1,4 +1,7 @@
 ---
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
+
 interface Props {
   title: string;
   description?: string;
@@ -24,19 +27,17 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     <meta name="description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="theme-color" content="#002fa7" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap" rel="stylesheet" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
     <div class="surface">
@@ -90,7 +91,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     --fg-0: oklch(0.985 0.003 260);
     --fg-1: oklch(0.9 0.01 260);
     --fg-2: oklch(0.76 0.018 260);
-    --fg-3: oklch(0.6 0.025 260);
+    --fg-3: oklch(0.74 0.02 260);
     --accent: oklch(0.985 0.003 260);
     --accent-soft: oklch(1 0 0 / 0.12);
     --border-soft: oklch(1 0 0 / 0.14);
@@ -100,8 +101,12 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     --ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
     --duration-fast: 160ms;
     --duration-med: 220ms;
-    --font-main: "Geist", sans-serif;
-    --font-mono: "Geist Mono", monospace;
+    --font-main: "Geist Variable", sans-serif;
+    --font-mono: "Geist Mono Variable", monospace;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   * {
@@ -274,7 +279,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     gap: 1.8rem;
   }
 
-  h3 {
+  .section-label {
     font-family: var(--font-mono);
     font-size: 0.72rem;
     font-weight: 450;
@@ -283,6 +288,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     color: var(--fg-2);
     margin-top: clamp(1.25rem, 2vw, 1.75rem);
     margin-bottom: 0.45rem;
+    scroll-margin-top: 2rem;
   }
 
   ul.links {
@@ -297,7 +303,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
   ul.links a {
     position: relative;
     display: inline-flex;
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border-strong);
     padding: 0.46rem 0.66rem;
     text-decoration: none;
   }
@@ -337,7 +343,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     font-weight: 600;
     letter-spacing: 0;
     line-height: 0.98;
-    max-width: 10ch;
+    max-width: 12ch;
   }
 
   .project-thesis {
@@ -435,7 +441,7 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
 
   .meta-grid dt {
     color: var(--fg-3);
-    font-size: 0.58rem;
+    font-size: 0.64rem;
     letter-spacing: 0.24em;
     line-height: 1.2;
     text-transform: uppercase;
@@ -491,6 +497,18 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
 
     .site-nav {
       justify-content: flex-start;
+    }
+
+    .site-nav a {
+      padding: 0.6rem 0.75rem;
+    }
+
+    ul.links a {
+      padding: 0.65rem 0.85rem;
+    }
+
+    .project-links a {
+      padding: 0.75rem 1rem;
     }
 
     .meta-grid {
