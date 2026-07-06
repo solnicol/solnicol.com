@@ -42,8 +42,17 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     <div class="surface">
       <header class="site-header" aria-label="Site header">
         <a class="site-mark" href="/" aria-label="Sol Nicol home">
-          <span>&gt;_S01</span>
-          <span>NIC01</span>
+          <span class="mark-sigil" aria-hidden="true">
+            <span class="mark-line">
+              <span class="mark-prompt">&gt;<span class="mark-cursor">_</span></span>
+              <span class="mark-stem">S</span>
+              <span class="mark-binary"><span class="mark-zero">0</span><span>1</span></span>
+            </span>
+            <span class="mark-line">
+              <span class="mark-name">NIC</span>
+              <span class="mark-binary"><span class="mark-zero">0</span><span>1</span></span>
+            </span>
+          </span>
         </a>
         <nav class="site-nav" aria-label="Primary navigation">
           <a href="/#experiments">Experiments</a>
@@ -151,18 +160,163 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
   }
 
   .site-mark {
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    padding: 0.38rem 0.44rem;
+    border: 1px solid transparent;
     font-family: var(--font-mono);
-    font-size: 14px;
-    letter-spacing: 0.04em;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
     line-height: 1.15;
     color: var(--fg-2);
+    text-decoration: none;
+    transition:
+      border-color var(--duration-med) var(--ease-out),
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-med) var(--ease-out);
+  }
+
+  .site-mark::before,
+  .site-mark::after {
+    position: absolute;
+    pointer-events: none;
+    content: "";
+    opacity: 0;
+    transition:
+      opacity var(--duration-med) var(--ease-out),
+      transform var(--duration-med) var(--ease-out);
+  }
+
+  .site-mark::before {
+    inset: -1px;
+    border: 1px solid var(--border-soft);
+    background:
+      linear-gradient(90deg, transparent, var(--accent-soft), transparent),
+      repeating-linear-gradient(
+        180deg,
+        transparent 0 5px,
+        oklch(1 0 0 / 0.045) 5px 6px
+      );
+    transform: scaleX(0.88);
+    z-index: -1;
+  }
+
+  .site-mark::after {
+    top: 0.2rem;
+    right: -0.25rem;
+    color: var(--accent);
+    content: "01";
+    font-size: 0.58rem;
+    line-height: 1;
+    transform: translateY(0.3rem);
   }
 
   .site-mark:hover {
     color: var(--fg-0);
     text-decoration: none;
+  }
+
+  .site-mark:hover::before,
+  .site-mark:focus-visible::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .site-mark:hover::after,
+  .site-mark:focus-visible::after {
+    opacity: 0.72;
+    transform: translateY(0);
+  }
+
+  .mark-sigil {
+    position: relative;
+    display: grid;
+    gap: 0.05rem;
+  }
+
+  .mark-line {
+    display: grid;
+    grid-template-columns: 2ch 1ch 2ch;
+    align-items: center;
+  }
+
+  .mark-line:last-child .mark-name {
+    grid-column: 1 / 3;
+  }
+
+  .mark-prompt,
+  .mark-stem,
+  .mark-name,
+  .mark-binary {
+    display: inline-flex;
+  }
+
+  .mark-prompt {
+    color: var(--fg-3);
+  }
+
+  .mark-cursor {
+    color: var(--fg-2);
+  }
+
+  .mark-binary {
+    position: relative;
+    justify-content: flex-end;
+    color: var(--accent);
+    text-shadow: 0 0 0 transparent;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      text-shadow var(--duration-med) var(--ease-out),
+      transform var(--duration-med) var(--ease-out);
+  }
+
+  .mark-zero {
+    position: relative;
+  }
+
+  .mark-zero::after {
+    position: absolute;
+    inset: 0;
+    color: var(--fg-0);
+    content: "O";
+    opacity: 0;
+    transform: translateY(0.2em);
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .site-mark:hover .mark-binary,
+  .site-mark:focus-visible .mark-binary {
+    color: var(--fg-0);
+    text-shadow: 0 0 16px var(--accent);
+    transform: translateX(0.08rem);
+  }
+
+  .site-mark:hover .mark-zero::after,
+  .site-mark:focus-visible .mark-zero::after {
+    opacity: 0.42;
+    transform: translateY(0);
+  }
+
+  .site-mark:hover .mark-cursor,
+  .site-mark:focus-visible .mark-cursor {
+    animation: cursor-wake 680ms steps(2, end) 1;
+    color: var(--accent);
+  }
+
+  @keyframes cursor-wake {
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    35%,
+    65% {
+      opacity: 0;
+    }
   }
 
   .site-nav {
