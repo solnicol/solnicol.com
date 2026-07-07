@@ -2,8 +2,8 @@
 title: Temperament Clock
 label: Horologium Quintarum
 thesis: The circle that almost closes.
-liveUrl: https://temperament-clock.vercel.app
-repoUrl: https://github.com/solnicol/temperament-clock
+liveUrl: /experiments/temperament-clock/
+repoUrl: https://github.com/solnicol/solnicol.com/tree/main/src/components/temperament-clock
 year: 2026
 tags: [music, web audio, interaction]
 ogDescription: A small experiment for hearing the gap where the circle of fifths almost closes.

@@ -7,7 +7,7 @@ const projects = defineCollection({
     title: z.string(),
     label: z.string(),
     thesis: z.string(),
-    liveUrl: z.string().url().optional(),
+    liveUrl: z.string().optional(),
     repoUrl: z.string().url().optional(),
     year: z.number(),
     tags: z.array(z.string()),

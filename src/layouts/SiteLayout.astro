@@ -84,6 +84,23 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
 
 <style is:global>
   :root {
+    /*
+      Palette: one ground, three inks, one signal.
+
+      Ground — International Klein Blue (#002FA7), hue 263. The sheet.
+      Inks   — white at three lightness steps. The drawing: structure,
+               wayfinding, prose. All borders are ink at reduced alpha.
+      Signal — gold leaf, hue 97: the opponent of hue 263 on the
+               blue–yellow axis of OKLab, and Klein's own pairing
+               (IKB / Monogold). Matched to the leaf itself: high
+               lightness, LOW chroma — real gold is pale, its richness
+               is sheen, not pigment. Reserved for what is LIVE: sound,
+               play, the active thing. Never for wayfinding, never for
+               structure. If in doubt, use ink. Contrast on ground
+               ≈ 5.7:1 (AA at any size). At display sizes the signal
+               may render as leaf — a gradient of the same metal (see
+               .glyph-code); small and functional text stays flat.
+    */
     --ikb: oklch(0.3785 0.1954 263.23);
     --bg-0: var(--ikb);
     --bg-1: var(--ikb);
@@ -91,7 +108,8 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     --fg-0: oklch(0.985 0.003 260);
     --fg-1: oklch(0.9 0.01 260);
     --fg-2: oklch(0.76 0.018 260);
-    --fg-3: oklch(0.74 0.02 260);
+    --fg-3: var(--fg-2);
+    --signal: oklch(0.8 0.08 97);
     --accent: oklch(0.985 0.003 260);
     --accent-soft: oklch(1 0 0 / 0.12);
     --border-soft: oklch(1 0 0 / 0.14);
@@ -378,6 +396,76 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     transform: translateY(-1px);
   }
 
+  .project-embed {
+    position: relative;
+    border: 1px solid var(--border-soft);
+    margin: 0;
+    padding-top: 1.5rem;
+  }
+
+  .project-embed::before {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-top: 1px solid var(--border-strong);
+    border-right: 1px solid var(--border-strong);
+    content: "";
+    opacity: 0.78;
+  }
+
+  .project-embed-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 450;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+    padding: 0.35rem 0.75rem;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .project-embed-id {
+    padding: 0.4rem 0;
+  }
+
+  .project-embed-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.4rem;
+    margin-right: -0.1rem;
+  }
+
+  .project-embed-actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0;
+    color: var(--fg-2);
+    text-decoration: none;
+  }
+
+  .project-embed-actions a:hover,
+  .project-embed-actions a:focus-visible {
+    color: var(--fg-0);
+  }
+
+  .project-embed-actions .arrow {
+    color: var(--accent);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .project-embed-actions a:hover .arrow,
+  .project-embed-actions a:focus-visible .arrow {
+    transform: translate(1px, -1px);
+  }
+
   .project-body {
     display: flex;
     flex-direction: column;
@@ -454,8 +542,9 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
     margin-top: 0.25rem;
   }
 
+  /* Selection is live — the one place gold touches prose. */
   ::selection {
-    background: var(--accent);
+    background: var(--signal);
     color: var(--bg-0);
   }
 
