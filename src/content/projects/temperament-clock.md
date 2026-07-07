@@ -7,6 +7,8 @@ repoUrl: https://github.com/solnicol/solnicol.com/tree/main/src/components/tempe
 year: 2026
 tags: [music, web audio, interaction]
 ogDescription: A small experiment for hearing the gap where the circle of fifths almost closes.
+embed: temperament-clock
+embedCaption: "Fig. 01 — Horologium Quintarum · sound on"
 ---
 
 ## Intro

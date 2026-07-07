@@ -75,6 +75,7 @@ export default function TemperamentClock({ embedded = false }) {
   const audioEngineRef = useRef(null);
   const dyadNodesRef = useRef(null);
   const guidedTimersRef = useRef([]);
+  const timersRef = useRef([]); // strike flashes + tour teardown
   // Sync the CSS-driven second hand to real time once at mount.
   const [secOffset] = useState(() => (Date.now() / 1000) % 60);
   const [prefersReducedMotion] = useState(
@@ -104,6 +105,14 @@ export default function TemperamentClock({ embedded = false }) {
 
   const getAudio = useCallback(() => getAudioEngine(audioEngineRef), []);
 
+  // Tracked setTimeout: strike flashes and tour teardown must not fire setState
+  // after unmount — same discipline as the audio and guided-sequence teardown.
+  const schedule = useCallback((fn, ms) => {
+    const id = setTimeout(fn, ms);
+    timersRef.current.push(id);
+    return id;
+  }, []);
+
   // If the component unmounts mid-tour, scheduled oscillators would keep
   // ringing on the audio thread. Shut the engine down with the component.
   useEffect(() => {
@@ -111,6 +120,14 @@ export default function TemperamentClock({ embedded = false }) {
       closeAudioEngine(audioEngineRef);
     };
   }, []);
+
+  useEffect(
+    () => () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    },
+    []
+  );
 
   // fifthSteps: position in fifths order (0 = C). "et" indexes the
   // octave-folded pitch class; "spiral" exponentiates a true 3:2.
@@ -122,16 +139,16 @@ export default function TemperamentClock({ embedded = false }) {
   const strike = useCallback(
     (idx, when = 0, dur = 2.4, mode = "et") => {
       playStrike({ engine: getAudio(), frequency: freqFor(idx, mode), when, duration: dur });
-      setTimeout(() => {
+      schedule(() => {
         setActiveIdx(idx % 12);
         setActiveStep(idx);
-        setTimeout(() => {
+        schedule(() => {
           setActiveIdx((cur) => (cur === idx % 12 ? null : cur));
           setActiveStep((cur) => (cur === idx ? null : cur));
         }, 1400);
       }, when * 1000);
     },
-    [freqFor, getAudio]
+    [freqFor, getAudio, schedule]
   );
 
   const stopDyad = useCallback(() => {
@@ -179,14 +196,14 @@ export default function TemperamentClock({ embedded = false }) {
     getAudio();
     const steps = mode === "spiral" ? 13 : 12;
     for (let i = 0; i < steps; i++) strike(i, i * 0.55, 1.6, mode);
-    setTimeout(() => {
+    schedule(() => {
       setTouring(false);
       setActiveStep(null);
     }, steps * 550 + 800);
     // The thread overlay animates off the tour clock; this timeout only
     // removes it once it has fully faded.
     setTourAnim({ mode, startedAt: Date.now() });
-    setTimeout(() => setTourAnim(null), 12 * 550 + 600 + 1400 + 200);
+    schedule(() => setTourAnim(null), 12 * 550 + 600 + 1400 + 200);
   };
 
   const clearGuidedTimers = () => {
