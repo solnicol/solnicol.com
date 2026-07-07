@@ -12,9 +12,9 @@ const {
   description = "Sol Nicol's digital home, exploring tech, systems, and timeless ideas.",
 } = Astro.props;
 
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://solnicol.com");
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://www.solnicol.com");
 const pageTitle = title === "Home" ? "Sol Nicol" : `${title} | Sol Nicol`;
-const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
+const ogImage = new URL("/og.jpg", Astro.site ?? "https://www.solnicol.com");
 ---
 
 <!doctype html>

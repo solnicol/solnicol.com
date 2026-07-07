@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://solnicol.com/sitemap-index.xml
+Sitemap: https://www.solnicol.com/sitemap-index.xml

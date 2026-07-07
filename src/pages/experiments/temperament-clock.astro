@@ -20,6 +20,12 @@ import TemperamentClock from "../../components/temperament-clock/TemperamentCloc
   </head>
   <body>
     <a class="back" href="/projects/temperament-clock/">&gt;_ notes</a>
+    <noscript>
+      <p class="noscript">
+        The Temperament Clock is an interactive audio instrument and needs
+        JavaScript to run. <a href="/projects/temperament-clock/">Read the notes</a> instead.
+      </p>
+    </noscript>
     <TemperamentClock client:only="react" />
   </body>
 </html>
@@ -56,5 +62,20 @@ import TemperamentClock from "../../components/temperament-clock/TemperamentCloc
     color: oklch(0.925 0.007 88.6);
     border-color: oklch(0.349 0.003 286.2);
     outline: none;
+  }
+
+  .noscript {
+    max-width: 30rem;
+    margin: 6rem auto 0;
+    padding: 0 1.5rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: center;
+    color: oklch(0.7 0.006 95.2);
+  }
+
+  .noscript a {
+    color: oklch(0.925 0.007 88.6);
   }
 </style>
