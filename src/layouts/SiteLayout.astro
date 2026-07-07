@@ -418,16 +418,52 @@ const ogImage = new URL("/og.jpg", Astro.site ?? "https://solnicol.com");
   .project-embed-label {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
-    gap: 0.5rem 1.5rem;
+    gap: 0.25rem 1.5rem;
     font-family: var(--font-mono);
     font-size: 0.62rem;
     font-weight: 450;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--fg-3);
-    padding: 0.55rem 0.75rem;
+    padding: 0.35rem 0.75rem;
     border-top: 1px solid var(--border-soft);
+  }
+
+  .project-embed-id {
+    padding: 0.4rem 0;
+  }
+
+  .project-embed-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.4rem;
+    margin-right: -0.1rem;
+  }
+
+  .project-embed-actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0;
+    color: var(--fg-2);
+    text-decoration: none;
+  }
+
+  .project-embed-actions a:hover,
+  .project-embed-actions a:focus-visible {
+    color: var(--fg-0);
+  }
+
+  .project-embed-actions .arrow {
+    color: var(--accent);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .project-embed-actions a:hover .arrow,
+  .project-embed-actions a:focus-visible .arrow {
+    transform: translate(1px, -1px);
   }
 
   .project-body {
