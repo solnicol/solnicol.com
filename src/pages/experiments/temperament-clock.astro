@@ -1,4 +1,5 @@
 ---
+import "@fontsource-variable/geist-mono";
 import TemperamentClock from "../../components/temperament-clock/TemperamentClock.jsx";
 ---
 
@@ -19,7 +20,10 @@ import TemperamentClock from "../../components/temperament-clock/TemperamentCloc
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
-    <a class="back" href="/projects/temperament-clock/">&gt;_ notes</a>
+    <a class="focus-mark" href="/" aria-label="Sol Nicol — home">
+      <span>&gt;_S01</span>
+      <span>NIC01</span>
+    </a>
     <noscript>
       <p class="noscript">
         The Temperament Clock is an interactive audio instrument and needs
@@ -41,27 +45,35 @@ import TemperamentClock from "../../components/temperament-clock/TemperamentCloc
     background: oklch(0.164 0.002 286.2);
   }
 
-  .back {
+  .focus-mark {
     position: fixed;
     top: 1rem;
     left: 1rem;
     z-index: 1;
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 11px;
-    letter-spacing: 0.14em;
+    display: grid;
+    gap: 0.05rem;
+    font-family: "Geist Mono Variable", monospace;
+    font-size: 15px;
+    letter-spacing: 0;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
     text-transform: uppercase;
-    color: oklch(0.524 0.006 95.2);
+    /* Identity, not signal — the mark stays ink, never brass. */
+    color: oklch(0.7 0.006 95.2);
     text-decoration: none;
-    padding: 0.5rem 0.6rem;
-    border: 1px solid transparent;
-    transition: color 160ms ease, border-color 160ms ease;
+    transition: color 160ms ease;
   }
 
-  .back:hover,
-  .back:focus-visible {
+  .focus-mark:hover,
+  .focus-mark:focus-visible {
     color: oklch(0.925 0.007 88.6);
-    border-color: oklch(0.349 0.003 286.2);
     outline: none;
+  }
+
+  @media (max-width: 480px) {
+    .focus-mark {
+      font-size: 13px;
+    }
   }
 
   .noscript {
