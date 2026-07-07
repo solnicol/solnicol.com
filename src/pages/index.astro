@@ -37,8 +37,7 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
           </a>
           <p>{project.data.thesis}</p>
           <div class="experiment-links">
-            <a href={`/projects/${projectSlug(project.id)}/`}>Read <span aria-hidden="true">→</span></a>
-            {project.data.liveUrl && <a href={project.data.liveUrl}>Enter <span aria-hidden="true">→</span></a>}
+            <a href={`/projects/${projectSlug(project.id)}/`}>Open <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>
