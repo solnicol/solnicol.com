@@ -8,43 +8,39 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
 
 <SiteLayout title="Home">
   <div class="hero">
-    <div class="hero-orbit" aria-hidden="true"></div>
     <h1 aria-label="Sol Nicol">
-      <span class="hero-line" aria-hidden="true">
-        <span>S</span><span class="glyph-swap"><span class="glyph-name">OL</span><span class="glyph-code">01</span></span>
-      </span>
-      <span class="hero-line" aria-hidden="true">
-        <span>NIC</span><span class="glyph-swap"><span class="glyph-name">OL</span><span class="glyph-code">01</span></span>
-      </span>
+        <span class="hero-line" aria-hidden="true">
+          <span>S</span><span class="glyph-swap"><span class="glyph-name">OL</span><span class="glyph-code">01</span></span>
+        </span>
+        <span class="hero-line" aria-hidden="true">
+          <span>NIC</span><span class="glyph-swap"><span class="glyph-name">OL</span><span class="glyph-code">01</span></span>
+        </span>
     </h1>
-    <p class="tagline">Visual experiments in design and code.</p>
+    <p class="tagline">Visual experiments in design and code</p>
   </div>
 
-  <h2 class="section-label" id="experiments">Section / Experiments</h2>
+  <h2 class="section-label" id="experiments">Experiments</h2>
 
   <div class="experiment-list">
-    {projects.map((project, i) => (
+    {projects.map((project) => (
       <div class="experiment">
-        <div class="experiment-signal" aria-hidden="true"></div>
         <div class="experiment-main">
           <div class="experiment-kicker">
-            <span class="experiment-index">{String(i + 1).padStart(2, "0")}</span>
-            <span>{project.data.year}</span>
-            <span class="experiment-tags">{project.data.tags.join(" / ")}</span>
+            <span class="experiment-concepts">{project.data.concepts.join(" / ")}</span>
           </div>
           <a class="experiment-title" href={`/projects/${projectSlug(project.id)}/`}>
             <strong>{project.data.title}</strong>
           </a>
           <p>{project.data.thesis}</p>
           <div class="experiment-links">
-            <a href={`/projects/${projectSlug(project.id)}/`}>Open <span aria-hidden="true">→</span></a>
+            <a href={`/projects/${projectSlug(project.id)}/`}>View experiment <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>
     ))}
   </div>
 
-  <h2 class="section-label" id="contact">Section / Contact</h2>
+  <h2 class="section-label" id="contact">Contact</h2>
 
   <ul class="links">
     <li><a href="mailto:sol@solnicol.com">sol@solnicol.com</a></li>
@@ -89,36 +85,6 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
     transform-origin: left;
   }
 
-  .hero-orbit {
-    position: absolute;
-    top: -8.5rem;
-    right: -8rem;
-    z-index: -1;
-    width: 28rem;
-    aspect-ratio: 1;
-    border: 1px solid var(--border-soft);
-    border-radius: 50%;
-    background:
-      repeating-conic-gradient(from 18deg, oklch(1 0 0 / 0.08) 0deg 1deg, transparent 1deg 7deg),
-      radial-gradient(circle, transparent 0 43%, var(--border-soft) 43.2% 43.6%, transparent 43.8%);
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  .hero-orbit::before,
-  .hero-orbit::after {
-    position: absolute;
-    border: 1px solid var(--border-soft);
-    border-radius: 50%;
-    content: "";
-    inset: 18%;
-  }
-
-  .hero-orbit::after {
-    inset: 34%;
-    border-style: dashed;
-  }
-
   .hero h1 {
     display: flex;
     flex-direction: column;
@@ -155,8 +121,6 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
   }
 
   .glyph-code {
-    /* Signal at display size renders as leaf — the material, not the
-       flat tone. color stands in where background-clip is unsupported. */
     color: var(--signal);
     background: linear-gradient(
       135deg,
@@ -194,139 +158,19 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
   }
 
   .experiment-list {
-    border-top: 1px solid var(--border-soft);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: start;
   }
 
   .experiment {
-    position: relative;
-    display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr);
-    gap: 1.5rem;
-    padding: 1.65rem 1rem 1.9rem 0;
-    border-bottom: 1px solid var(--border-soft);
-    border-left: 1px solid transparent;
-    transition:
-      background-color var(--duration-med) var(--ease-out),
-      border-color var(--duration-med) var(--ease-out),
-      transform var(--duration-med) var(--ease-out);
-  }
-
-  .experiment::before {
-    position: absolute;
-    top: -1px;
-    right: 0;
-    width: 0.7rem;
-    height: 0.7rem;
-    border-top: 1px solid var(--border-strong);
-    border-right: 1px solid var(--border-strong);
-    content: "";
-    opacity: 0.64;
-    transition: opacity var(--duration-med) var(--ease-out);
-  }
-
-  .experiment::after {
-    position: absolute;
-    top: -1px;
-    right: 0;
-    left: 0;
-    height: 1px;
-    background: var(--accent);
-    content: "";
-    opacity: 0;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition:
-      opacity var(--duration-med) var(--ease-out),
-      transform var(--duration-med) var(--ease-out);
-  }
-
-  @media (hover: hover) {
-    .experiment:hover {
-      border-color: var(--border-strong);
-      background: oklch(1 0 0 / 0.035);
-      transform: translateY(-2px);
-    }
-
-    .experiment:hover::after {
-      opacity: 0.72;
-      transform: scaleX(1);
-    }
-
-    .experiment:hover::before {
-      opacity: 1;
-    }
-  }
-
-  .experiment:focus-within {
-    border-color: var(--border-strong);
-    background: oklch(1 0 0 / 0.035);
-    transform: translateY(-2px);
-  }
-
-  .experiment:focus-within::after {
-    opacity: 0.72;
-    transform: scaleX(1);
-  }
-
-  .experiment:focus-within::before {
-    opacity: 1;
-  }
-
-  .experiment-signal {
-    position: relative;
-    align-self: start;
-    width: 4.6rem;
-    aspect-ratio: 1;
-    margin-top: 0.1rem;
-    border: 1px solid var(--border-soft);
-    border-radius: 50%;
-    background:
-      linear-gradient(90deg, transparent calc(50% - 0.5px), var(--border-strong) 50%, transparent calc(50% + 0.5px)),
-      linear-gradient(0deg, transparent calc(50% - 0.5px), var(--border-strong) 50%, transparent calc(50% + 0.5px)),
-      radial-gradient(circle at center, transparent 0 21%, var(--border-soft) 21.5% 22.5%, transparent 23% 42%, var(--border-soft) 42.5% 43.5%, transparent 44%);
-    transition:
-      border-color var(--duration-med) var(--ease-out),
-      transform var(--duration-med) var(--ease-out);
-  }
-
-  .experiment-signal::before,
-  .experiment-signal::after {
-    position: absolute;
-    content: "";
-  }
-
-  .experiment-signal::before {
-    top: 50%;
-    left: 50%;
-    width: 0.72rem;
-    height: 0.72rem;
-    border: 1px solid var(--accent);
-    transform: translate(-50%, -50%);
-  }
-
-  .experiment-signal::after {
-    inset: 15%;
-    border: 1px dashed var(--border-soft);
-    border-radius: 50%;
-  }
-
-  @media (hover: hover) {
-    .experiment:hover .experiment-signal {
-      border-color: var(--accent);
-      transform: rotate(18deg);
-    }
-  }
-
-  .experiment:focus-within .experiment-signal {
-    border-color: var(--accent);
-    transform: rotate(18deg);
+    min-width: 0;
   }
 
   .experiment-kicker {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    align-items: center;
+    display: block;
+    min-height: 2.5rem;
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.28em;
@@ -334,11 +178,7 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
     color: var(--fg-2);
   }
 
-  .experiment-index {
-    color: var(--accent);
-  }
-
-  .experiment-tags {
+  .experiment-concepts {
     color: var(--fg-3);
     letter-spacing: 0.18em;
   }
@@ -347,19 +187,18 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
+    min-width: 0;
+    width: 100%;
   }
 
   .experiment-title {
-    width: fit-content;
+    display: block;
     text-decoration: none;
   }
 
-  /* Stretch the title link over the whole card so the hover lift matches
-     what is actually clickable; the buttons below re-raise themselves. */
-  .experiment-title::after {
-    position: absolute;
-    inset: 0;
-    content: "";
+  .experiment-title:hover strong,
+  .experiment-title:focus-visible strong {
+    color: var(--fg-1);
   }
 
   .experiment-main strong {
@@ -391,18 +230,18 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
 
   .experiment-links a {
     position: relative;
+    z-index: 1;
     display: inline-flex;
     gap: 0.35rem;
     align-items: center;
-    border: 1px solid var(--border-strong);
-    padding: 0.42rem 0.58rem;
+    width: fit-content;
+    color: var(--fg-2);
     text-decoration: none;
   }
 
   .experiment-links a:hover,
   .experiment-links a:focus-visible {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    color: var(--fg-0);
   }
 
   .experiment-links span {
@@ -420,8 +259,8 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
       font-size: 4.6rem;
     }
 
-    .hero-orbit {
-      right: -13rem;
+    .experiment-list {
+      gap: 2.5rem;
     }
   }
 
@@ -434,28 +273,19 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
       font-size: 1.2rem;
     }
 
-    .hero-orbit {
-      top: -6rem;
-      right: -15rem;
-      width: 24rem;
-    }
-
-    .experiment {
-      grid-template-columns: 1fr;
-      gap: 1.1rem;
-    }
-
-    .experiment-signal {
-      width: 3.5rem;
+    .experiment-list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.5rem;
     }
 
     .experiment-main strong {
       font-size: 1.75rem;
     }
 
-    .experiment-links a {
-      padding: 0.7rem 0.85rem;
+    .experiment-kicker {
+      min-height: 0;
     }
+
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -463,6 +293,57 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
     .glyph-code {
       transition: none !important;
       transform: none !important;
+    }
+  }
+
+</style>
+
+<style is:global>
+  .hero .glyph-swap {
+    display: inline-grid;
+    min-width: 1.19em;
+    color: inherit;
+    perspective: 0.9em;
+  }
+
+  .hero .glyph-name,
+  .hero .glyph-code {
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+    transform-origin: center 58%;
+    transition:
+      opacity 420ms var(--ease-out),
+      transform 420ms var(--ease-out);
+    will-change: opacity, transform;
+  }
+
+  .hero .glyph-code {
+    color: var(--signal);
+    background: linear-gradient(
+      135deg,
+      oklch(55% 0.12 72) 0%,
+      oklch(75% 0.14 82) 25%,
+      oklch(92% 0.08 88) 50%,
+      oklch(70% 0.15 80) 75%,
+      oklch(48% 0.13 70) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+    transform: rotateX(74deg) translateY(0.035em);
+  }
+
+  @media (hover: hover) {
+    .hero h1:hover .glyph-name {
+      opacity: 0;
+      transform: rotateX(-74deg) translateY(-0.035em);
+    }
+
+    .hero h1:hover .glyph-code {
+      opacity: 1;
+      transform: rotateX(0deg) translateY(0);
     }
   }
 </style>

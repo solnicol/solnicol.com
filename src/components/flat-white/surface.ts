@@ -15,7 +15,6 @@ export interface SurfaceUniforms {
   diffuse: number;
   energy: number;
   pointer: [number, number];
-  mode: number;
   reduced: number;
 }
 
@@ -26,7 +25,7 @@ export interface Surface {
   /**
    * Render the current field into a small offscreen target and return its
    * RGBA bytes. Feeds the visible-structure score, so it samples the same
-   * scene the visitor sees — coffee or noise alike.
+   * same coffee surface the visitor sees.
    */
   sample(u: SurfaceUniforms): { data: Uint8Array; size: number };
   dispose(): void;
@@ -55,7 +54,6 @@ export function createSurface(canvas: HTMLCanvasElement): Surface {
     uDiffuse: { value: 0 },
     uEnergy: { value: 0 },
     uPointer: { value: new THREE.Vector2(0, 0) },
-    uMode: { value: 0 },
     uReduced: { value: 0 },
   };
 
@@ -85,7 +83,6 @@ export function createSurface(canvas: HTMLCanvasElement): Surface {
     uniforms.uDiffuse.value = v.diffuse;
     uniforms.uEnergy.value = v.energy;
     uniforms.uPointer.value.set(v.pointer[0], v.pointer[1]);
-    uniforms.uMode.value = v.mode;
     uniforms.uReduced.value = v.reduced;
   };
 

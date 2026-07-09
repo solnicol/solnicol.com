@@ -31,7 +31,6 @@ const hasEmbed = Boolean(embed);
 >
   <article class="project-page">
     <header class="project-hero">
-      <p class="project-label">{project.data.label}</p>
       <h1>{project.data.title}</h1>
       <p class="project-thesis">{project.data.thesis}</p>
       {!hasEmbed && (project.data.liveUrl || project.data.repoUrl) && (
@@ -48,12 +47,10 @@ const hasEmbed = Boolean(embed);
         {embed === "flat-white" && <FlatWhiteExperiment embedded client:only="react" />}
         <noscript>
           <p style="padding: 1.25rem 0.75rem; color: var(--fg-2); font-size: 0.9rem; line-height: 1.6;">
-            This figure is an interactive audio model and needs JavaScript. The notes below explain it,
-            or open it <a href={project.data.liveUrl}>fullscreen</a>.
+            This figure needs JavaScript, or open it <a href={project.data.liveUrl}>fullscreen</a>
           </p>
         </noscript>
         <figcaption class="project-embed-label">
-          <span class="project-embed-id">{project.data.embedCaption}</span>
           <span class="project-embed-actions">
             {project.data.liveUrl && (
               <a href={project.data.liveUrl}>Fullscreen <span class="arrow" aria-hidden="true">⤢</span></a>
