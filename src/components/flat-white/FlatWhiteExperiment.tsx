@@ -445,19 +445,17 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           margin: 0 auto;
           aspect-ratio: 1;
         }
+        /* You stir with a teaspoon, not a hand. Hotspot sits in the bowl. */
         .fw-canvas {
           display: block;
           width: 100%;
           height: 100%;
           border-radius: 50%;
-          cursor: grab;
+          cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='rotate(40 16 16)'%3E%3Crect x='14.8' y='2.5' width='2.4' height='14' rx='1.2' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1'/%3E%3Cellipse cx='16' cy='23' rx='4.4' ry='6' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E") 12 21, pointer;
           touch-action: none;
           box-shadow:
             0 1px 0 oklch(1 0 0 / 0.06) inset,
             0 18px 48px oklch(0 0 0 / 0.45);
-        }
-        .fw-canvas:active {
-          cursor: grabbing;
         }
         .fw-canvas[data-unavailable] {
           background: radial-gradient(circle at 40% 38%, oklch(0.86 0.06 82), oklch(0.36 0.07 55));
