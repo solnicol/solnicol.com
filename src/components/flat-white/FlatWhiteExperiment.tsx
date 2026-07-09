@@ -488,7 +488,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
 
         .fw-instruction {
           position: absolute;
-          bottom: 1.1rem;
+          bottom: 2.6rem; /* sits on the liquid, clear of the ceramic rim */
           left: 0;
           right: 0;
           text-align: center;

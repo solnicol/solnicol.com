@@ -175,11 +175,34 @@ void main() {
     col *= 0.985 + 0.03 * fbm(p * 5.5);
   }
 
-  // Crema rim and a soft upper-left microfoam sheen for depth.
-  float rim = smoothstep(0.86, 1.0, r);
-  col = mix(col, ESPRESSO * 0.7, rim * 0.6);
+  // Soft upper-left microfoam sheen on the liquid.
   float sheen = clamp(1.0 - length(p - vec2(-0.32, 0.36)) * 1.15, 0.0, 1.0);
   col += sheen * sheen * 0.05;
+
+  // Vessel cue, not café realism: a warm ceramic rim and a meniscus shadow
+  // give the surface containment — liquid in a cup, not a floating disk.
+  // Coffee to 0.92, meniscus band to 0.945, stoneware to the edge; the CSS
+  // box-shadow outside the canvas plays the outer cup shadow.
+  float aa = 3.0 / uRes.y;
+
+  // The liquid darkens slightly as it approaches the wall.
+  float edgeDark = smoothstep(0.84, 0.92, r);
+  col = mix(col, col * 0.80, edgeDark * 0.5);
+
+  // Meniscus: thin warm inner shadow between liquid and ceramic.
+  float men = smoothstep(0.92 - aa, 0.92 + aa, r)
+            * (1.0 - smoothstep(0.945 - aa, 0.945 + aa, r));
+  col = mix(col, vec3(0.216, 0.125, 0.071), men * 0.6);
+
+  // Matte stoneware rim, lit from upper-left, slightly irregular.
+  float ring = smoothstep(0.945 - aa, 0.945 + aa, r);
+  vec3 ceramic = vec3(0.902, 0.824, 0.729);
+  float lightDir = dot(p / max(r, 1e-4), normalize(vec2(-0.6, 0.75)));
+  ceramic = mix(ceramic, vec3(1.0, 0.945, 0.859), clamp(lightDir, 0.0, 1.0) * 0.65);
+  ceramic = mix(ceramic, vec3(0.725, 0.608, 0.494), clamp(-lightDir, 0.0, 1.0) * 0.4);
+  ceramic *= 0.975 + 0.05 * vnoise(p * 9.0);
+  ceramic = mix(ceramic, vec3(0.725, 0.608, 0.494), smoothstep(0.985, 1.0, r) * 0.45);
+  col = mix(col, ceramic, ring);
 
   gl_FragColor = vec4(col, inside);
 }
