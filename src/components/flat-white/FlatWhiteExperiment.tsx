@@ -245,14 +245,18 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
 
     const fit = () => {
       const size = canvas.clientWidth;
+      // Measure only after a real layout: with no size, uRes still holds its
+      // placeholder and the shader's supersample offsets blow up, so a sample
+      // would read a uniform field and report a convincing-looking zero.
       if (size > 0) {
         surface.resize(size);
         // Redraw the current state after a resize even when idle.
         surface.render(uniformsOf(simRef.current));
+        measureNow(simRef.current, true);
+        paint(simRef.current);
       }
     };
     fit();
-    measureNow(simRef.current, true);
     paint(simRef.current);
 
     const ro = new ResizeObserver(fit);
@@ -452,7 +456,11 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           height: 100%;
           border-radius: 50%;
           cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='rotate(40 16 16)'%3E%3Crect x='14.8' y='2.5' width='2.4' height='14' rx='1.2' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1'/%3E%3Cellipse cx='16' cy='23' rx='4.4' ry='6' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E") 12 21, pointer;
-          touch-action: none;
+          /* pan-y, not none: the cup spans the whole mobile viewport, so
+             vertical swipes must keep scrolling the page. The browser hands
+             us horizontal-leading gestures (stirs) and takes vertical ones
+             (scrolls, ending the drag via pointercancel). */
+          touch-action: pan-y;
           box-shadow:
             0 1px 0 oklch(1 0 0 / 0.06) inset,
             0 18px 48px oklch(0 0 0 / 0.45);
