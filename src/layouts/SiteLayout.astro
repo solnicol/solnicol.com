@@ -5,16 +5,18 @@ import "@fontsource-variable/geist-mono";
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
 }
 
 const {
   title,
   description = "Sol Nicol's digital home, exploring tech, systems, and timeless ideas.",
+  ogImage: ogImagePath = "/og.jpg",
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://www.solnicol.com");
 const pageTitle = title === "Home" ? "Sol Nicol" : `${title} | Sol Nicol`;
-const ogImage = new URL("/og.jpg", Astro.site ?? "https://www.solnicol.com");
+const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
 ---
 
 <!doctype html>

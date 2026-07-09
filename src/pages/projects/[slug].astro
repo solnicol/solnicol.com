@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import TemperamentClock from "../../components/temperament-clock/TemperamentClock.jsx";
+import FlatWhiteExperiment from "../../components/flat-white/FlatWhiteExperiment.tsx";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -23,7 +24,11 @@ const embed = project.data.embed;
 const hasEmbed = Boolean(embed);
 ---
 
-<SiteLayout title={project.data.title} description={project.data.ogDescription ?? project.data.thesis}>
+<SiteLayout
+  title={project.data.title}
+  description={project.data.ogDescription ?? project.data.thesis}
+  ogImage={project.data.ogImage}
+>
   <article class="project-page">
     <header class="project-hero">
       <p class="project-label">{project.data.label}</p>
@@ -40,6 +45,7 @@ const hasEmbed = Boolean(embed);
     {hasEmbed && (
       <figure class="project-embed">
         {embed === "temperament-clock" && <TemperamentClock embedded client:only="react" />}
+        {embed === "flat-white" && <FlatWhiteExperiment embedded client:only="react" />}
         <noscript>
           <p style="padding: 1.25rem 0.75rem; color: var(--fg-2); font-size: 0.9rem; line-height: 1.6;">
             This figure is an interactive audio model and needs JavaScript. The notes below explain it,
