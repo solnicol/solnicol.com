@@ -24,7 +24,11 @@ const embed = project.data.embed;
 const hasEmbed = Boolean(embed);
 ---
 
-<SiteLayout title={project.data.title} description={project.data.ogDescription ?? project.data.thesis}>
+<SiteLayout
+  title={project.data.title}
+  description={project.data.ogDescription ?? project.data.thesis}
+  ogImage={project.data.ogImage}
+>
   <article class="project-page">
     <header class="project-hero">
       <p class="project-label">{project.data.label}</p>

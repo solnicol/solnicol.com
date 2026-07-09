@@ -12,6 +12,8 @@ const projects = defineCollection({
     year: z.number(),
     tags: z.array(z.string()),
     ogDescription: z.string().optional(),
+    // Site-relative path to a social-card image; falls back to /og.jpg.
+    ogImage: z.string().optional(),
     // Key into the embed registry in projects/[slug].astro. When set, the
     // project renders its live component in place instead of hero CTAs.
     embed: z.string().optional(),

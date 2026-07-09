@@ -2,6 +2,12 @@
 import "@fontsource-variable/geist";
 import "@fontsource-variable/geist-mono";
 import FlatWhiteExperiment from "../../components/flat-white/FlatWhiteExperiment.tsx";
+
+const title = "Flat White | Sol Nicol";
+const description =
+  "A small model of the unstable middle between separation and uniformity. Stir a stylised milk heart into filaments and watch diffusion erase them into a uniform flat white.";
+const canonical = new URL("/experiments/flat-white/", Astro.site);
+const ogImage = new URL("/og-flat-white.jpg", Astro.site);
 ---
 
 <!doctype html>
@@ -9,12 +15,20 @@ import FlatWhiteExperiment from "../../components/flat-white/FlatWhiteExperiment
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flat White | Sol Nicol</title>
-    <meta
-      name="description"
-      content="A small model of the unstable middle between separation and uniformity. Stir a stylised milk heart into filaments and watch diffusion erase them into a uniform flat white."
-    />
-    <link rel="canonical" href={new URL("/experiments/flat-white/", Astro.site)} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <meta name="theme-color" content="#14100d" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />

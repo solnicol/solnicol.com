@@ -7,6 +7,7 @@ repoUrl: https://github.com/solnicol/solnicol.com/tree/main/src/components/flat-
 year: 2026
 tags: [mixing, webgl, interaction, threejs]
 ogDescription: Stir a milk heart into filaments and watch diffusion erase them into a uniform flat white.
+ogImage: /og-flat-white.jpg
 embed: flat-white
 embedCaption: "Fig. 02 — Structura Lactis · drag to stir"
 ---
