@@ -434,8 +434,8 @@ export default function TemperamentClock({ embedded = false }) {
 
       {!embedded && (
         <header style={{ textAlign: "center", marginBottom: 20 }}>
-          <div style={{ fontSize: 11, letterSpacing: "0.38em", color: INK, textTransform: "uppercase" }}>
-            Horologium Quintarum
+          <div style={{ fontSize: 11, letterSpacing: "0.24em", color: INK, textTransform: "uppercase" }}>
+            Temperament Clock
           </div>
           <div style={{ marginTop: 6, fontSize: 9, letterSpacing: "0.24em", color: DIM, textTransform: "uppercase" }}>
             A study in musical temperament
@@ -447,7 +447,7 @@ export default function TemperamentClock({ embedded = false }) {
         viewBox="0 0 400 400"
         style={{ width: "min(88vw, 420px)", height: "auto", display: "block" }}
         role="img"
-        aria-label={`Circle of fifths clock showing ${pad(hours)}:${pad(minutes)}. The hour note is ${currentNote.label}.`}
+        aria-label={`Circle of fifths clock showing ${pad(hours)}:${pad(minutes)} with hour note ${currentNote.label}`}
       >
         <circle cx={C} cy={C} r={192} fill="none" stroke={FAINT} strokeWidth="1" />
         <circle cx={C} cy={C} r={186} fill="none" stroke={DIM} strokeWidth="0.5" opacity="0.5" />
@@ -634,8 +634,8 @@ export default function TemperamentClock({ embedded = false }) {
             {currentNote.label}
             {currentNote.sub ? ` / ${currentNote.sub}` : ""}
           </span>
-          {" — "}
-          {currentNote.sig} · rel.{" "}
+          {" · "}
+          {currentNote.sig} · relative{" "}
           <span className="note-label" style={{ fontSize: 15, fontStyle: "italic", letterSpacing: 0 }}>
             {currentNote.rel}
           </span>

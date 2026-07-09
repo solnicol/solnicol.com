@@ -1,46 +1,24 @@
 ---
 title: Temperament Clock
-label: Horologium Quintarum
-thesis: The circle that almost closes.
+thesis: Hear the gap in a circle of fifths
 liveUrl: /experiments/temperament-clock/
 repoUrl: https://github.com/solnicol/solnicol.com/tree/main/src/components/temperament-clock
 year: 2026
-tags: [music, web audio, interaction]
-ogDescription: A small experiment for hearing the gap where the circle of fifths almost closes.
+concepts: [circle of fifths, music theory]
+ogDescription: Hear the gap where the circle of fifths fails to close
 embed: temperament-clock
-embedCaption: "Fig. 01 — Horologium Quintarum · sound on"
 ---
 
-## Intro
+## The Gap
 
-The circle of fifths looks complete.
+Twelve pure fifths do not return exactly to their starting pitch
 
-Twelve steps. Twelve notes. One clean loop.
+The mismatch is the Pythagorean comma
 
-But if each step is a pure 3:2 fifth, the loop doesn't land exactly where it started. It overshoots seven octaves by a tiny amount called the Pythagorean comma.
+## Hear It
 
-That tiny gap is the whole problem.
+Move around the circle one fifth at a time
 
-## What it does
+Each interval is stable on its own
 
-This is a small experiment for hearing that gap.
-
-Move around the clock one fifth at a time. Each step sounds fine on its own. Then the error starts to build.
-
-Your eye sees a circle.
-
-Your ear hears the drift.
-
-## Why it exists
-
-The circle of fifths is useful, but it's too neat.
-
-It hides the compromise underneath tuning. You can have pure fifths, clean octaves, and a closed twelve note cycle.
-
-But not all at once.
-
-This clock isolates that failure point and lets you hear it.
-
-The circle almost closes.
-
-Almost is the interesting part.
+The accumulated drift appears at the closing point

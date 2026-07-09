@@ -1,4 +1,4 @@
-# Temperament Clock — *Horologium Quintarum*
+# Temperament Clock
 
 A working clock whose hours are the circle of fifths — and an audible, visible
 demonstration of why that circle only closes because we tempered it shut.

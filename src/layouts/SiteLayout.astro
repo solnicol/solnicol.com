@@ -10,7 +10,7 @@ interface Props {
 
 const {
   title,
-  description = "Sol Nicol's digital home, exploring tech, systems, and timeless ideas.",
+  description = "Sol Nicol's digital home for visual experiments",
   ogImage: ogImagePath = "/og.jpg",
 } = Astro.props;
 
@@ -45,7 +45,7 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     <div class="surface">
       <header class="site-header" aria-label="Site header">
         <a class="site-mark" href="/" aria-label="Sol Nicol home">
-          <span class="mark-sigil" aria-hidden="true">
+          <span class="mark-sigil" aria-hidden="true" style="display: grid; gap: 0.05rem;">
             <span>&gt;_S01</span>
             <span>NIC01</span>
           </span>
@@ -60,26 +60,6 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
         <slot />
       </main>
 
-      <footer class="metadata">
-        <dl class="meta-grid" aria-label="Site metadata">
-          <div>
-            <dt>Drawn By</dt>
-            <dd>Sol Nicol</dd>
-          </div>
-          <div>
-            <dt>Sheet</dt>
-            <dd>S01 / NIC01</dd>
-          </div>
-          <div>
-            <dt>Location</dt>
-            <dd>Edinburgh</dd>
-          </div>
-          <div>
-            <dt>Revision</dt>
-            <dd>2026</dd>
-          </div>
-        </dl>
-      </footer>
     </div>
   </body>
 </html>
@@ -101,7 +81,7 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
                structure. If in doubt, use ink. Contrast on ground
                ≈ 5.7:1 (AA at any size). At display sizes the signal
                may render as leaf — a gradient of the same metal (see
-               .glyph-code); small and functional text stays flat.
+               small and functional text stays flat.
     */
     --ikb: oklch(0.3785 0.1954 263.23);
     --bg-0: var(--ikb);
@@ -281,16 +261,13 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
 
   .site-nav a {
     position: relative;
-    border: 1px solid var(--border-soft);
-    padding: 0.34rem 0.52rem;
+    color: var(--fg-2);
     text-decoration: none;
   }
 
   .site-nav a:hover,
   .site-nav a:focus-visible {
-    border-color: var(--accent);
-    background: var(--accent-soft);
-    text-decoration: none;
+    color: var(--fg-0);
   }
 
   .content {
@@ -323,16 +300,13 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
   ul.links a {
     position: relative;
     display: inline-flex;
-    border: 1px solid var(--border-strong);
-    padding: 0.46rem 0.66rem;
+    color: var(--fg-2);
     text-decoration: none;
   }
 
   ul.links a:hover,
   ul.links a:focus-visible {
-    border-color: var(--accent);
-    background: var(--accent-soft);
-    text-decoration: none;
+    color: var(--fg-0);
   }
 
   .project-page {
@@ -347,14 +321,6 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     gap: 0.9rem;
     border-bottom: 1px solid var(--border-soft);
     padding-bottom: 1.65rem;
-  }
-
-  .project-label {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--fg-2);
   }
 
   .project-hero h1 {
@@ -433,10 +399,6 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     border-top: 1px solid var(--border-soft);
   }
 
-  .project-embed-id {
-    padding: 0.4rem 0;
-  }
-
   .project-embed-actions {
     display: flex;
     flex-wrap: wrap;
@@ -507,43 +469,6 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     text-decoration-color: var(--fg-0);
   }
 
-  .metadata {
-    border-top: 1px solid var(--border-soft);
-    padding-top: 0;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--fg-2);
-  }
-
-  .meta-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-left: 1px solid var(--border-soft);
-    list-style: none;
-  }
-
-  .meta-grid div {
-    min-width: 0;
-    border-right: 1px solid var(--border-soft);
-    border-bottom: 1px solid var(--border-soft);
-    padding: 0.62rem 0.72rem 0.68rem;
-  }
-
-  .meta-grid dt {
-    color: var(--fg-3);
-    font-size: 0.64rem;
-    letter-spacing: 0.24em;
-    line-height: 1.2;
-    text-transform: uppercase;
-  }
-
-  .meta-grid dd {
-    color: var(--fg-1);
-    font-size: 0.72rem;
-    line-height: 1.35;
-    margin-top: 0.25rem;
-  }
-
   /* Selection is live — the one place gold touches prose. */
   ::selection {
     background: var(--signal);
@@ -600,10 +525,6 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
 
     .project-links a {
       padding: 0.75rem 1rem;
-    }
-
-    .meta-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .project-hero h1 {

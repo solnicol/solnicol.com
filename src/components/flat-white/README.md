@@ -1,7 +1,7 @@
-# Flat White — *Structura Lactis*
+# Flat White
 
 A small interactive model of structure between order and uniformity. A milk
-heart on dark coffee is stirred into filaments and eddies, then diffuses into a
+rosetta on textured crema is stirred into filaments and eddies, then diffuses into a
 uniform flat white — with a live curve tracking a **visible-structure proxy**.
 
 **Live:** [full screen](https://solnicol.com/experiments/flat-white/) ·
@@ -13,7 +13,7 @@ This folder is the canonical source. It renders as a React island inside the
 ## The idea
 
 Order is simple; noise is simple; the interesting part is the unstable middle.
-The heart is ordered but trivial. A uniform beige is the maximum-entropy end
+The rosetta is ordered but legible. A uniform beige is the maximum-entropy end
 state and equally trivial. In between, stirring draws the milk into coherent
 filaments — briefly *more* visible structure than either extreme — before
 diffusion erases it.
@@ -28,10 +28,7 @@ value is a *structure proxy*, not "true complexity".
   the pattern; a live vortex trails the pointer.
 - **Watch structure rise and fall** — an SVG curve labelled *visible structure*
   climbs through the stirred middle and falls as the surface settles.
-- **Compare with noise** — a comparison mode shows a high-frequency random field.
-  It is busy everywhere and coherent nowhere, and the proxy stays low: busy is
-  not the same as structured.
-- **Replay / Pause** — reset to the ordered heart, or freeze the evolution.
+- **Replay / Pause** — reset to the ordered rosetta, or freeze the evolution.
 
 ## How it works (MVP)
 
@@ -40,10 +37,9 @@ drawn with a GLSL fragment shader.
 
 The mixing is a **simplified, stateless model**, not a solver:
 
-- The milk field is defined once in a *material* coordinate space, built the
-  way a latte heart actually forms: a soft round milk mass (the monk's head)
-  with a vertical centre cut that carves the top cleft and draws out the
-  tapered tail. Contour rings and a pale pour spine give it poured texture.
+- The milk field is defined once in a *material* coordinate space. A central
+  stem, paired curved leaves and a small top heart build the rosetta as one
+  continuous poured gesture.
 - Stirring is a coordinate warp read back per frame: a live vortex around the
   pointer, plus a **global differential rotation** whose angle grows toward the
   centre. Differential rotation is what actually winds a compact blob into
@@ -54,27 +50,25 @@ The mixing is a **simplified, stateless model**, not a solver:
 ## How the score is computed
 
 The visible-structure curve is **measured from the rendered surface**, not
-from the gesture. Every half second the current field — coffee or noise alike —
-is rendered into a 64×64 offscreen target and read back, then scored in
+from the gesture. Every half second the current coffee surface is rendered into
+a 64×64 offscreen target and read back, then scored in
 `structure.ts`:
 
 1. Pixels map to milk concentration via luminance, normalised between the
    espresso and cream tones. The crema rim is masked out.
-2. **fine** = fraction of neighbouring pixel pairs whose concentration step
-   exceeds a visibility threshold (0.15) — boundary density at pixel scale.
-3. **medium** = the same fraction after 2×2 box-downsampling — boundaries that
-   survive blurring, i.e. contours organised into shapes.
-4. **coherence** = 1 − fine/medium, clamped to [0, 1]. Coherent form has sparse
-   pixel-scale boundaries relative to shape-scale ones; noise has fine ≥ medium
-   and gates to ~0.
-5. **score** = medium × coherence, normalised and shown with a mild display
-   gamma.
+2. **medium edge energy** measures the contour density after a 2x2 box blur.
+   This rewards filaments and folds over a stable rosetta outline.
+3. **coarse tonal variation** measures the remaining non-uniformity after an
+   8x8 blur, so a visibly soft swirl does not disappear from the curve early.
+4. **persistence and fine-detail gates** discount contrast that exists only at
+   the smallest scale.
+5. **score** combines those three render-derived terms. It never reads pointer
+   motion, elapsed diffusion, or the comparison-mode flag.
 
-Measured values: uniform beige ≈ 0%, the clean heart ≈ 45–50%, the stirred
-middle ≈ 95%+, random noise ≈ 5% despite being the busiest field on screen.
-That last contrast is the point: busy is not the same as structured. If the
-WebGL readback ever fails, the curve falls back to a pointer-derived estimate
-rather than dying.
+The curve is calibrated so uniform coffee-and-milk reads near 0%, the clean
+rosetta stays legible and the stirred middle rises before disappearing with the
+surface. If the WebGL readback ever fails, the curve falls back to a
+pointer-derived estimate rather than dying.
 
 ## What this taught me
 
@@ -146,8 +140,8 @@ the component wiring and the page around it would not change.
 ## Accessibility & performance
 
 - Pointer Events cover mouse and touch; `touch-action: none` on the canvas.
-- `prefers-reduced-motion` freezes the shimmer and noise animation and slows the
-  diffusion clock; stirring stays user-driven.
+- `prefers-reduced-motion` freezes the surface shimmer and slows the diffusion
+  clock; stirring stays user-driven.
 - The `requestAnimationFrame` loop runs only while something is changing (a drag,
   live energy, an unfinished diffusion, or animated noise) and stops when idle.
 

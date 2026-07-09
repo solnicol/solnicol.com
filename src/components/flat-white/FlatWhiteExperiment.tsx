@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createSurface, type Surface, type SurfaceUniforms } from "./surface";
-import { structureScore } from "./structure";
+import { structureStats } from "./structure";
 
 // Tuning. The mixing model is a proxy, not a solver, so these are chosen for
-// legibility of the ORDER → STRUCTURE → UNIFORMITY arc rather than realism.
+// legibility of the full mixing progression rather than realism.
 const DIFFUSE_SECONDS = 34; // order → uniform once stirring has begun
 const WIND_FULL = 7; // winding (radians) that reads as fully structured
 const WIND_MAX = 14; // clamp so filaments stay broad and legible
@@ -11,8 +11,6 @@ const CURVE_HZ = 12; // curve points per second
 const CURVE_SPAN = 22; // seconds held in the curve window
 const CURVE_N = CURVE_HZ * CURVE_SPAN;
 const MEASURE_INTERVAL = 0.5; // seconds between surface readbacks
-
-type State = "ORDER" | "STRUCTURE" | "UNIFORMITY" | "NOISE";
 
 interface Sim {
   wind: number;
@@ -54,17 +52,13 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   const simRef = useRef<Sim>(freshSim());
   const rafRef = useRef<number | null>(null);
   const historyRef = useRef<number[]>([]);
-  const badgeRef = useRef<HTMLSpanElement>(null);
   const valueRef = useRef<HTMLSpanElement>(null);
   const pathRef = useRef<SVGPolylineElement>(null);
 
   const [paused, setPaused] = useState(false);
-  const [noise, setNoise] = useState(false);
   const [stirred, setStirred] = useState(false);
   const pausedRef = useRef(paused);
-  const noiseRef = useRef(noise);
   pausedRef.current = paused;
-  noiseRef.current = noise;
 
   const reduced = useRef(
     typeof window !== "undefined" &&
@@ -75,9 +69,6 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   // this pointer-derived estimate instead of dying. The real score comes
   // from the rendered pixels via structureScore.
   const structureProxy = useCallback((s: Sim): number => {
-    if (noiseRef.current) {
-      return 0.12 + 0.03 * Math.sin(s.time * 1.7);
-    }
     const windNorm = Math.min(Math.abs(s.wind) / WIND_FULL, 1);
     const live = Math.min(s.energy * 0.25, 0.2);
     return Math.max(0, Math.min(1, (windNorm + live) * (1 - s.diffuse)));
@@ -92,7 +83,6 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       diffuse: s.diffuse,
       energy: s.energy,
       pointer: s.pointer,
-      mode: noiseRef.current ? 1 : 0,
       reduced: reduced ? 1 : 0,
     }),
     [reduced]
@@ -107,7 +97,8 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       if (!surface || fallbackRef.current) return;
       try {
         const { data, size } = surface.sample(uniformsOf(s));
-        s.structureTarget = structureScore(data, size);
+        const stats = structureStats(data, size);
+        s.structureTarget = stats.score;
         if (snap) s.structure = s.structureTarget;
       } catch (err) {
         console.warn("Flat White: surface readback failed, using proxy", err);
@@ -117,24 +108,8 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     [uniformsOf]
   );
 
-  const stateOf = useCallback((s: Sim): State => {
-    if (noiseRef.current) return "NOISE";
-    if (!s.started || (Math.abs(s.wind) / WIND_FULL < 0.12 && s.diffuse < 0.05)) return "ORDER";
-    if (s.diffuse > 0.82) return "UNIFORMITY";
-    return "STRUCTURE";
-  }, []);
-
   // Push the current sim into the DOM readouts without re-rendering React.
-  const paint = useCallback(
-    (s: Sim) => {
-      const badge = badgeRef.current;
-      if (badge) {
-        const st = stateOf(s);
-        if (badge.dataset.state !== st) {
-          badge.dataset.state = st;
-          badge.textContent = st;
-        }
-      }
+  const paint = useCallback((s: Sim) => {
       if (valueRef.current) {
         valueRef.current.textContent = `${Math.round(s.structure * 100)}%`;
       }
@@ -154,9 +129,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           path.setAttribute("points", "");
         }
       }
-    },
-    [stateOf]
-  );
+    }, []);
 
   const frame = useCallback(() => {
     const surface = surfaceRef.current;
@@ -213,8 +186,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       !pausedRef.current &&
       (s.dragging ||
         s.energy > 0.002 ||
-        (s.started && s.diffuse < 1) ||
-        (noiseRef.current && !reduced));
+        (s.started && s.diffuse < 1));
     if (busy) {
       rafRef.current = requestAnimationFrame(frame);
     } else {
@@ -283,6 +255,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!surfaceRef.current) return;
+      e.preventDefault();
       try {
         e.currentTarget.setPointerCapture(e.pointerId);
       } catch {
@@ -307,6 +280,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       const s = simRef.current;
       if (!s.dragging) return;
+      e.preventDefault();
       const [x, y] = pointerPos(e);
       const prev = s.pointer;
       const dist = Math.hypot(x - prev[0], y - prev[1]);
@@ -358,24 +332,6 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     });
   }, [ensureLoop]);
 
-  const toggleNoise = useCallback(() => {
-    setNoise((n) => {
-      const next = !n;
-      noiseRef.current = next;
-      ensureLoop();
-      // Redraw and re-measure immediately so the switch is visible and the
-      // score honest even when idle.
-      const surface = surfaceRef.current;
-      const s = simRef.current;
-      if (surface) {
-        surface.render(uniformsOf(s));
-        measureNow(s, true);
-      }
-      paint(s);
-      return next;
-    });
-  }, [ensureLoop, measureNow, paint, uniformsOf]);
-
   return (
     <div className="fw" data-embedded={embedded ? "" : undefined}>
       <div className="fw-stage">
@@ -383,23 +339,22 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           ref={canvasRef}
           className="fw-canvas"
           role="img"
-          aria-label="A circular flat white with a milk heart. Drag across the surface to stir it into filaments; the pattern slowly settles into a uniform beige."
+          aria-label="Circular flat white with a rosetta that stirs into filaments before settling into a uniform beige"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
+          onContextMenu={(e) => e.preventDefault()}
+          draggable={false}
         />
-        <span className="fw-badge" ref={badgeRef} data-state="ORDER" aria-hidden="true">
-          ORDER
-        </span>
         <p className="fw-instruction" data-stirred={stirred ? "" : undefined} aria-hidden="true">
-          {noise ? "Busy, not structured." : "Stir the pattern."}
+          Stir the pattern
         </p>
       </div>
 
       <div className="fw-readout">
         <div className="fw-curve" aria-hidden="true">
-          <span className="fw-curve-label">visible structure</span>
+          <span className="fw-curve-label">Structure</span>
           <svg className="fw-curve-plot" viewBox="0 0 100 34" preserveAspectRatio="none">
             <line className="fw-curve-base" x1="0" y1="32" x2="100" y2="32" />
             <polyline ref={pathRef} className="fw-curve-line" points="" />
@@ -416,9 +371,6 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           <button type="button" onClick={togglePause} aria-pressed={paused}>
             {paused ? "Resume" : "Pause"}
           </button>
-          <button type="button" onClick={toggleNoise} aria-pressed={noise}>
-            Compare with noise
-          </button>
         </div>
       </div>
 
@@ -434,6 +386,8 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           flex-direction: column;
           gap: 1.4rem;
           width: 100%;
+          -webkit-user-select: none;
+          user-select: none;
         }
         .fw[data-embedded] {
           --fw-ink: var(--fg-0);
@@ -448,6 +402,10 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           width: min(30rem, 100%);
           margin: 0 auto;
           aspect-ratio: 1;
+          overscroll-behavior: contain;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          user-select: none;
         }
         /* You stir with a teaspoon, not a hand. Hotspot sits in the bowl. */
         .fw-canvas {
@@ -456,34 +414,17 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           height: 100%;
           border-radius: 50%;
           cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='rotate(40 16 16)'%3E%3Crect x='14.8' y='2.5' width='2.4' height='14' rx='1.2' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1'/%3E%3Cellipse cx='16' cy='23' rx='4.4' ry='6' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E") 12 21, pointer;
-          /* pan-y, not none: the cup spans the whole mobile viewport, so
-             vertical swipes must keep scrolling the page. The browser hands
-             us horizontal-leading gestures (stirs) and takes vertical ones
-             (scrolls, ending the drag via pointercancel). */
-          touch-action: pan-y;
+          touch-action: none;
+          -webkit-tap-highlight-color: transparent;
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          user-select: none;
           box-shadow:
             0 1px 0 oklch(1 0 0 / 0.06) inset,
             0 18px 48px oklch(0 0 0 / 0.45);
         }
         .fw-canvas[data-unavailable] {
           background: radial-gradient(circle at 40% 38%, oklch(0.86 0.06 82), oklch(0.36 0.07 55));
-        }
-
-        .fw-badge {
-          position: absolute;
-          top: 0.9rem;
-          left: 0.9rem;
-          font-family: var(--font-mono, "Geist Mono Variable", monospace);
-          font-size: 0.62rem;
-          letter-spacing: 0.28em;
-          text-transform: uppercase;
-          color: oklch(0.96 0.02 85);
-          background: oklch(0.2 0.03 55 / 0.55);
-          border: 1px solid oklch(0.96 0.02 85 / 0.28);
-          padding: 0.28rem 0.5rem;
-          border-radius: 2px;
-          pointer-events: none;
-          backdrop-filter: blur(2px);
         }
 
         .fw-instruction {
