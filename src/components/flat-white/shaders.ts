@@ -114,7 +114,7 @@ float milkAt(vec2 p) {
   // filaments stay visible instead of over-mixing into flat espresso.
   float shear = clamp(abs(uWind) * 0.10, 0.0, 1.0);
   float d = heartField(q);
-  float w = 0.016 + uDiffuse * 0.9 + shear * 0.35;
+  float w = 0.016 + uDiffuse * 0.9 + shear * 0.16;
   float milk = smoothstep(w, -w, d);
 
   // Interior tone — stylised pour texture, not flat white. Rings follow the
@@ -151,11 +151,13 @@ void main() {
 
   vec3 col;
   if (uMode > 0.5) {
-    // Comparison: high-frequency noise. Busy everywhere, coherent nowhere.
+    // Comparison: high-frequency noise. Busy everywhere, coherent nowhere —
+    // at low frequency fbm reads as clouds, which are (honestly) structure,
+    // so the formless field must live at pixel scale.
     vec2 q = p;
-    float n = fbm(q * 5.0 + vec2(uTime * 0.04 * (1.0 - uReduced), 0.0));
-    n = fbm(q * 5.0 + n * 1.2);
-    col = mix(ESPRESSO, CREAM, smoothstep(0.25, 0.75, n));
+    float n = fbm(q * 16.0 + vec2(uTime * 0.06 * (1.0 - uReduced), 0.0));
+    n = fbm(q * 16.0 + n * 0.5);
+    col = mix(ESPRESSO, CREAM, smoothstep(0.3, 0.7, n));
   } else {
     // Rotated-grid supersample keeps the thin filaments clean.
     float px = 0.42 / uRes.y;

@@ -50,9 +50,31 @@ The mixing is a **simplified, stateless model**, not a solver:
   spiral filaments, so it does the visual work.
 - Diffusion blends the whole field toward one mean milk fraction and melts the
   edges.
-- The structure proxy is computed in TypeScript from accumulated winding, live
-  stir energy and the diffusion term — high in the coherent middle, low at both
-  extremes.
+
+## How the score is computed
+
+The visible-structure curve is **measured from the rendered surface**, not
+from the gesture. Every half second the current field — coffee or noise alike —
+is rendered into a 64×64 offscreen target and read back, then scored in
+`structure.ts`:
+
+1. Pixels map to milk concentration via luminance, normalised between the
+   espresso and cream tones. The crema rim is masked out.
+2. **fine** = fraction of neighbouring pixel pairs whose concentration step
+   exceeds a visibility threshold (0.15) — boundary density at pixel scale.
+3. **medium** = the same fraction after 2×2 box-downsampling — boundaries that
+   survive blurring, i.e. contours organised into shapes.
+4. **coherence** = 1 − fine/medium, clamped to [0, 1]. Coherent form has sparse
+   pixel-scale boundaries relative to shape-scale ones; noise has fine ≥ medium
+   and gates to ~0.
+5. **score** = medium × coherence, normalised and shown with a mild display
+   gamma.
+
+Measured values: uniform beige ≈ 0%, the clean heart ≈ 45–50%, the stirred
+middle ≈ 95%+, random noise ≈ 5% despite being the busiest field on screen.
+That last contrast is the point: busy is not the same as structured. If the
+WebGL readback ever fails, the curve falls back to a pointer-derived estimate
+rather than dying.
 
 Because the field is a pure function of a handful of uniforms, the surface is
 cheap and the render loop stops when nothing is changing.
@@ -60,9 +82,11 @@ cheap and the render loop stops when nothing is changing.
 ## Files
 
 - `FlatWhiteExperiment.tsx` — the island: state, animation timing, pointer
-  interaction, the structure proxy, the curve, the state badge and the controls.
-- `surface.ts` — the Three.js renderer: `ShaderMaterial`, quad, uniform plumbing.
+  interaction, the measurement cadence, the curve, the badge and the controls.
+- `surface.ts` — the Three.js renderer: `ShaderMaterial`, quad, uniform
+  plumbing, and the offscreen sampling target for the measurement.
 - `shaders.ts` — the GLSL vertex and fragment shaders (the mixing model).
+- `structure.ts` — the visible-structure score, computed from sampled pixels.
 
 ## Upgrade path
 

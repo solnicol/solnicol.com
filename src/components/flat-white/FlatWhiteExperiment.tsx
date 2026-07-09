@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createSurface, type Surface, type SurfaceUniforms } from "./surface";
+import { structureScore } from "./structure";
 
 // Tuning. The mixing model is a proxy, not a solver, so these are chosen for
 // legibility of the ORDER → STRUCTURE → UNIFORMITY arc rather than realism.
 const DIFFUSE_SECONDS = 34; // order → uniform once stirring has begun
 const WIND_FULL = 7; // winding (radians) that reads as fully structured
 const WIND_MAX = 14; // clamp so filaments stay broad and legible
-const CURVE_HZ = 12; // structure samples per second
+const CURVE_HZ = 12; // curve points per second
 const CURVE_SPAN = 22; // seconds held in the curve window
 const CURVE_N = CURVE_HZ * CURVE_SPAN;
+const MEASURE_INTERVAL = 0.5; // seconds between surface readbacks
 
 type State = "ORDER" | "STRUCTURE" | "UNIFORMITY" | "NOISE";
 
@@ -22,8 +24,10 @@ interface Sim {
   dragging: boolean;
   lastAngle: number | null;
   clock: number; // performance.now of last frame
-  curveAcc: number; // seconds accumulated toward the next curve sample
-  structure: number;
+  curveAcc: number; // seconds accumulated toward the next curve point
+  measureAcc: number; // seconds accumulated toward the next readback
+  structure: number; // displayed value, eased toward structureTarget
+  structureTarget: number; // latest measured score
 }
 
 function freshSim(): Sim {
@@ -38,7 +42,9 @@ function freshSim(): Sim {
     lastAngle: null,
     clock: 0,
     curveAcc: 0,
+    measureAcc: 0,
     structure: 0,
+    structureTarget: 0,
   };
 }
 
@@ -65,15 +71,51 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
   ).current;
 
+  // Fallback only: if the WebGL readback ever fails, the curve degrades to
+  // this pointer-derived estimate instead of dying. The real score comes
+  // from the rendered pixels via structureScore.
   const structureProxy = useCallback((s: Sim): number => {
     if (noiseRef.current) {
-      // Busy but not structured: a low floor with a little shimmer.
       return 0.12 + 0.03 * Math.sin(s.time * 1.7);
     }
     const windNorm = Math.min(Math.abs(s.wind) / WIND_FULL, 1);
     const live = Math.min(s.energy * 0.25, 0.2);
     return Math.max(0, Math.min(1, (windNorm + live) * (1 - s.diffuse)));
   }, []);
+
+  const fallbackRef = useRef(false);
+
+  const uniformsOf = useCallback(
+    (s: Sim): SurfaceUniforms => ({
+      time: s.time,
+      wind: s.wind,
+      diffuse: s.diffuse,
+      energy: s.energy,
+      pointer: s.pointer,
+      mode: noiseRef.current ? 1 : 0,
+      reduced: reduced ? 1 : 0,
+    }),
+    [reduced]
+  );
+
+  // Read the rendered surface back and score it. `snap` jumps the displayed
+  // value (mount, replay, mode switch); otherwise the frame loop eases
+  // toward the target between readbacks.
+  const measureNow = useCallback(
+    (s: Sim, snap: boolean) => {
+      const surface = surfaceRef.current;
+      if (!surface || fallbackRef.current) return;
+      try {
+        const { data, size } = surface.sample(uniformsOf(s));
+        s.structureTarget = structureScore(data, size);
+        if (snap) s.structure = s.structureTarget;
+      } catch (err) {
+        console.warn("Flat White: surface readback failed, using proxy", err);
+        fallbackRef.current = true;
+      }
+    },
+    [uniformsOf]
+  );
 
   const stateOf = useCallback((s: Sim): State => {
     if (noiseRef.current) return "NOISE";
@@ -136,9 +178,22 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       }
     }
 
-    s.structure = structureProxy(s);
+    // Measure the surface at a fixed cadence, then ease the displayed value
+    // toward the latest reading between readbacks.
+    if (!pausedRef.current) {
+      s.measureAcc += dt;
+      if (s.measureAcc >= MEASURE_INTERVAL) {
+        s.measureAcc = 0;
+        measureNow(s, false);
+      }
+    }
+    if (fallbackRef.current) {
+      s.structure = structureProxy(s);
+    } else {
+      s.structure += (s.structureTarget - s.structure) * Math.min(1, dt * 4);
+    }
 
-    // Sample the curve at a fixed rate regardless of frame rate.
+    // Append to the curve at a fixed rate regardless of frame rate.
     if (!pausedRef.current) {
       s.curveAcc += dt;
       const interval = 1 / CURVE_HZ;
@@ -150,16 +205,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       }
     }
 
-    const u: SurfaceUniforms = {
-      time: s.time,
-      wind: s.wind,
-      diffuse: s.diffuse,
-      energy: s.energy,
-      pointer: s.pointer,
-      mode: noiseRef.current ? 1 : 0,
-      reduced: reduced ? 1 : 0,
-    };
-    surface.render(u);
+    surface.render(uniformsOf(s));
     paint(s);
 
     // Keep looping only while something is actually changing.
@@ -174,7 +220,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     } else {
       rafRef.current = null;
     }
-  }, [paint, reduced, structureProxy]);
+  }, [measureNow, paint, reduced, structureProxy, uniformsOf]);
 
   const ensureLoop = useCallback(() => {
     if (rafRef.current == null && !pausedRef.current) {
@@ -202,18 +248,11 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       if (size > 0) {
         surface.resize(size);
         // Redraw the current state after a resize even when idle.
-        surface.render({
-          time: simRef.current.time,
-          wind: simRef.current.wind,
-          diffuse: simRef.current.diffuse,
-          energy: simRef.current.energy,
-          pointer: simRef.current.pointer,
-          mode: noiseRef.current ? 1 : 0,
-          reduced: reduced ? 1 : 0,
-        });
+        surface.render(uniformsOf(simRef.current));
       }
     };
     fit();
+    measureNow(simRef.current, true);
     paint(simRef.current);
 
     const ro = new ResizeObserver(fit);
@@ -226,7 +265,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       surface.dispose();
       surfaceRef.current = null;
     };
-  }, [paint, reduced]);
+  }, [measureNow, paint, uniformsOf]);
 
   // Pointer → stir. Angular motion around the centre winds the pattern;
   // any motion feeds the live vortex energy.
@@ -298,20 +337,13 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     setStirred(false);
     setPaused(false);
     pausedRef.current = false;
-    paint(simRef.current);
     const surface = surfaceRef.current;
     if (surface) {
-      surface.render({
-        time: 0,
-        wind: 0,
-        diffuse: 0,
-        energy: 0,
-        pointer: [0, 0],
-        mode: noiseRef.current ? 1 : 0,
-        reduced: reduced ? 1 : 0,
-      });
+      surface.render(uniformsOf(simRef.current));
+      measureNow(simRef.current, true);
     }
-  }, [paint, reduced]);
+    paint(simRef.current);
+  }, [measureNow, paint, uniformsOf]);
 
   const togglePause = useCallback(() => {
     setPaused((p) => {
@@ -327,24 +359,18 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       const next = !n;
       noiseRef.current = next;
       ensureLoop();
-      // Redraw immediately so the switch is visible even when idle.
+      // Redraw and re-measure immediately so the switch is visible and the
+      // score honest even when idle.
       const surface = surfaceRef.current;
       const s = simRef.current;
       if (surface) {
-        surface.render({
-          time: s.time,
-          wind: s.wind,
-          diffuse: s.diffuse,
-          energy: s.energy,
-          pointer: s.pointer,
-          mode: next ? 1 : 0,
-          reduced: reduced ? 1 : 0,
-        });
+        surface.render(uniformsOf(s));
+        measureNow(s, true);
       }
       paint(s);
       return next;
     });
-  }, [ensureLoop, paint, reduced]);
+  }, [ensureLoop, measureNow, paint, uniformsOf]);
 
   return (
     <div className="fw" data-embedded={embedded ? "" : undefined}>
