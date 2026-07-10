@@ -1,7 +1,7 @@
 # Flat White
 
 A small interactive model of structure between order and uniformity. A milk
-rosetta on textured crema is stirred into filaments and eddies, then diffuses into a
+heart on textured crema folds into filaments and eddies, then diffuses into a
 uniform flat white — with a live curve tracking a **visible-structure proxy**.
 
 **Live:** [full screen](https://solnicol.com/experiments/flat-white/) ·
@@ -13,8 +13,8 @@ This folder is the canonical source. It renders as a React island inside the
 ## The idea
 
 Order is simple; noise is simple; the interesting part is the unstable middle.
-The rosetta is ordered but legible. A uniform beige is the maximum-entropy end
-state and equally trivial. In between, stirring draws the milk into coherent
+The heart is ordered but legible. A uniform beige is the maximum-entropy end
+state and equally trivial. In between, differential flow draws the milk into coherent
 filaments — briefly *more* visible structure than either extreme — before
 diffusion erases it.
 
@@ -24,28 +24,29 @@ value is a *structure proxy*, not "true complexity".
 
 ## What it does
 
-- **Stir** — drag or touch the surface. Angular motion around the centre winds
-  the pattern; a live vortex trails the pointer.
+- **Run automatically** — a roughly one-minute one-shot timeline carries the heart from
+  order through folding and diffusion to a uniform surface.
 - **Watch structure rise and fall** — an SVG curve labelled *visible structure*
-  climbs through the stirred middle and falls as the surface settles.
-- **Replay / Pause** — reset to the ordered rosetta, or freeze the evolution.
+  climbs through the folded middle and falls as the surface settles.
+- **Replay / Pause** — reset to the ordered heart, or freeze the evolution.
 
-## How it works (MVP)
+## How it works
 
-The surface is a single Three.js full-screen quad (`ShaderMaterial` on a plane)
-drawn with a GLSL fragment shader.
+The surface uses Three.js full-screen passes drawn with GLSL fragment shaders.
 
-The mixing is a **simplified, stateless model**, not a solver:
+The mixing is a **simplified advection–diffusion simulation**, not a full fluid
+solver:
 
-- The milk field is defined once in a *material* coordinate space. A central
-  stem, paired curved leaves and a small top heart build the rosetta as one
-  continuous poured gesture.
-- Stirring is a coordinate warp read back per frame: a live vortex around the
-  pointer, plus a **global differential rotation** whose angle grows toward the
-  centre. Differential rotation is what actually winds a compact blob into
-  spiral filaments, so it does the visual work.
-- Diffusion blends the whole field toward one mean milk fraction and melts the
-  edges.
+- A pair of half-float render targets stores milk concentration. A softly
+  warped milk mass and centre pull seed the heart into both targets.
+- Every frame back-traces the previous concentration through alternating
+  horizontal and vertical shear fields. Several neighbouring flow cells fold
+  the existing heart boundary without imposing net cup rotation.
+- The targets swap after each step, so every fold acts on material already
+  changed by the previous one.
+- Local diffusion softens neighbouring concentration values. A late coarse
+  term represents unresolved cup-scale diffusion towards the seeded field's
+  conserved mean.
 
 ## How the score is computed
 
@@ -57,18 +58,18 @@ a 64×64 offscreen target and read back, then scored in
 1. Pixels map to milk concentration via luminance, normalised between the
    espresso and cream tones. The crema rim is masked out.
 2. **medium edge energy** measures the contour density after a 2x2 box blur.
-   This rewards filaments and folds over a stable rosetta outline.
+   This rewards filaments and folds over a stable heart outline.
 3. **coarse tonal variation** measures the remaining non-uniformity after an
    8x8 blur, so a visibly soft swirl does not disappear from the curve early.
 4. **persistence and fine-detail gates** discount contrast that exists only at
    the smallest scale.
-5. **score** combines those three render-derived terms. It never reads pointer
-   motion, elapsed diffusion, or the comparison-mode flag.
+5. **score** combines those three render-derived terms. It never reads the
+   animation timeline or elapsed diffusion.
 
 The curve is calibrated so uniform coffee-and-milk reads near 0%, the clean
-rosetta stays legible and the stirred middle rises before disappearing with the
+heart stays legible and the folded middle rises before disappearing with the
 surface. If the WebGL readback ever fails, the curve falls back to a
-pointer-derived estimate rather than dying.
+timeline-derived estimate rather than dying.
 
 ## What this taught me
 
@@ -79,11 +80,11 @@ you can interrogate beats an object you can only admire.
 **The primitives underneath this project**
 
 1. **Advection as a coordinate warp** — moving fluid is equivalent to moving
-   *where you look up* the material. The shader never moves paint; it warps
-   the lookup coordinates and reads the original field through them.
-2. **Differential rotation → stretching and folding** — a rotation whose angle
-   grows toward the centre winds a compact blob into spiral filaments.
-   Interface length grows as feature width shrinks; that is what mixing *is*.
+   *where you look up* the previous material state. Each new texture reads the
+   last one through a back-traced flow field.
+2. **Alternating shear → stretching and folding** — horizontal and vertical
+   shears do not commute. Each direction acts on material stretched by the
+   previous one, increasing interface length without a global spin.
 3. **Advection creates gradients; diffusion destroys them** — the unstable
    middle exists because the two act on different timescales, and uniformity
    is the only fixed point.
@@ -101,49 +102,43 @@ you can interrogate beats an object you can only admire.
 - **Primitive learned:** the rise-and-fall of visible structure in mixing can
   be made measurable with nothing more than edge fractions at two scales and
   their ratio — no entropy estimation required.
-- **Mistakes corrected:** two. The first curve measured the *gesture* (pointer
-  winding), not the surface — decorative, not evidential. And the first
+- **Mistakes corrected:** two. The first curve measured the *input gesture*,
+  not the surface — decorative, not evidential. And the first
   comparison field was low-frequency fbm, which the measurement correctly
   scored as *structure*: clouds are coherent form. The measure disciplined the
   exhibit, which is what a real measure does.
 - **Test I should now pass:** explain why random noise scores near zero under
-  a fine/medium coherence gate while stirred filaments score high — and why
+  a fine/medium coherence gate while folded filaments score high — and why
   raw contrast alone would invert that ranking.
 
 **Check yourself**
 
-1. Why does stirring *increase* visible structure before diffusion erases it?
+1. Why does folding *increase* visible structure before diffusion erases it?
 2. Why must the comparison noise live at pixel scale for "busy is not
    structured" to be an honest demonstration?
 3. Why does the score gate on the fine/medium boundary *ratio* rather than
    subtracting one from the other?
 
-Because the field is a pure function of a handful of uniforms, the surface is
-cheap and the render loop stops when nothing is changing.
+The fixed-resolution simulation is independent of the displayed canvas size,
+and the render loop stops once the terminal uniform state is reached.
 
 ## Files
 
-- `FlatWhiteExperiment.tsx` — the island: state, animation timing, pointer
-  interaction, the measurement cadence, the curve, the badge and the controls.
-- `surface.ts` — the Three.js renderer: `ShaderMaterial`, quad, uniform
-  plumbing, and the offscreen sampling target for the measurement.
-- `shaders.ts` — the GLSL vertex and fragment shaders (the mixing model).
+- `FlatWhiteExperiment.tsx` — the island: timeline state, visibility-aware
+  animation, measurement cadence, curve, phase label and controls.
+- `surface.ts` — the Three.js renderer: ping-pong targets, simulation and
+  display passes, plus the offscreen sampling target for measurement.
+- `shaders.ts` — the GLSL seed, advection–diffusion and display shaders.
 - `structure.ts` — the visible-structure score, computed from sampled pixels.
-
-## Upgrade path
-
-Replace the stateless `milkAt` in `shaders.ts` with a **ping-pong simulation**:
-two `THREE.WebGLRenderTarget`s, advect + diffuse the milk field each step, and
-sample the result. The renderer would gain the target pair and a step shader;
-the component wiring and the page around it would not change.
 
 ## Accessibility & performance
 
-- Pointer Events cover mouse and touch; `touch-action: none` on the canvas.
-- `prefers-reduced-motion` freezes the surface shimmer and slows the diffusion
-  clock; stirring stays user-driven.
-- The `requestAnimationFrame` loop runs only while something is changing (a drag,
-  live energy, an unfinished diffusion, or animated noise) and stops when idle.
+- The canvas requires no pointer gesture, so normal mobile scrolling remains
+  untouched.
+- `prefers-reduced-motion` presents the ordered surface without running the
+  automated timeline.
+- The simulation pauses when the canvas leaves the viewport or the document is
+  hidden, and stops permanently when diffusion reaches its terminal state.
 
 ## Running locally
 

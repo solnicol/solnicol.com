@@ -5,7 +5,7 @@ import FlatWhiteExperiment from "../../components/flat-white/FlatWhiteExperiment
 
 const title = "Flat White | Sol Nicol";
 const description =
-  "Stir a rosetta into folds and watch the surface settle";
+  "Watch a latte-art heart fold, disperse and settle into uniformity";
 const canonical = new URL("/experiments/flat-white/", Astro.site);
 const ogImage = new URL("/og-flat-white.jpg", Astro.site);
 ---
@@ -46,7 +46,7 @@ const ogImage = new URL("/og-flat-white.jpg", Astro.site);
         <h1>Flat White</h1>
         <p class="essay-sub">A small model of mixing</p>
         <p class="essay-intro">
-          Stir the rosetta into folds, then watch the surface settle
+          Watch the heart fold, disperse, then settle into uniformity
         </p>
       </header>
 
@@ -59,16 +59,6 @@ const ogImage = new URL("/og-flat-white.jpg", Astro.site);
 
       <FlatWhiteExperiment client:only="react" />
 
-      <section class="essay-body">
-        <p>
-          Each leaf is a boundary between milk and coffee
-          Stirring pulls those boundaries into finer folds
-          The rosetta loses its shape, but the surface briefly gains structure
-        </p>
-        <p class="essay-note">
-          The curve follows that middle
-        </p>
-      </section>
     </main>
   </body>
 </html>

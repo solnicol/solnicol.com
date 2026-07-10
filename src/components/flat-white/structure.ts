@@ -24,8 +24,8 @@ const TONAL_FLOOR = 0.025;
 const TONAL_RANGE = 0.4;
 const EDGE_REFERENCE = 0.115;
 const EDGE_POWER = 3;
-const FINE_NOISE_START = 0.13;
-const FINE_NOISE_RANGE = 0.16;
+const FINE_NOISE_START = 0.22;
+const FINE_NOISE_RANGE = 0.18;
 const EXPECTED_SCALE_GAIN = MEDIUM_DOWN * 0.75;
 
 function clamp01(value: number): number {
@@ -148,7 +148,7 @@ export function structureStats(data: Uint8Array, size: number): StructureStats {
   // Coherent features retain or gain energy when viewed at a wider sampling
   // step. Fine noise loses energy through the 2x2 box filter.
   const persistence = fine > 0 ? clamp01(medium / (fine * EXPECTED_SCALE_GAIN)) : 0;
-  // A compact heart has one large contour. Stirring increases the density of
+  // A compact heart has one large contour. Folding increases the density of
   // organised contours, so make that difference legible without hardcoding
   // the gesture or simulation state into the score.
   const edge = clamp01((medium / EDGE_REFERENCE) ** EDGE_POWER) * persistence ** 1.5;
