@@ -33,10 +33,9 @@ const hasEmbed = Boolean(embed);
     <header class="project-hero">
       <h1>{project.data.title}</h1>
       <p class="project-thesis">{project.data.thesis}</p>
-      {!hasEmbed && (project.data.liveUrl || project.data.repoUrl) && (
-        <div class="project-links" aria-label="Project links">
-          {project.data.liveUrl && <a href={project.data.liveUrl}>Enter</a>}
-          {project.data.repoUrl && <a href={project.data.repoUrl}>Source</a>}
+      {!hasEmbed && project.data.liveUrl && (
+        <div class="project-links" aria-label="Study links">
+          <a href={project.data.liveUrl}>Enter</a>
         </div>
       )}
     </header>
@@ -54,9 +53,6 @@ const hasEmbed = Boolean(embed);
           <span class="project-embed-actions">
             {project.data.liveUrl && (
               <a href={project.data.liveUrl}>Fullscreen <span class="arrow" aria-hidden="true">⤢</span></a>
-            )}
-            {project.data.repoUrl && (
-              <a href={project.data.repoUrl}>Source <span class="arrow" aria-hidden="true">↗</span></a>
             )}
           </span>
         </figcaption>
