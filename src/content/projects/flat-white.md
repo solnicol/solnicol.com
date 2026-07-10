@@ -1,6 +1,6 @@
 ---
 title: Flat White
-thesis: A small model of mixing
+thesis: Mixing makes visible structure before it erases it
 liveUrl: /experiments/flat-white/
 repoUrl: https://github.com/solnicol/solnicol.com/tree/main/src/components/flat-white
 year: 2026

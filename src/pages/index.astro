@@ -16,10 +16,10 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
           <span>NIC</span><span class="glyph-swap"><span class="glyph-name">OL</span><span class="glyph-code">01</span></span>
         </span>
     </h1>
-    <p class="tagline">Visual experiments in design and code</p>
+    <p class="tagline">Making structure visible</p>
   </div>
 
-  <h2 class="section-label" id="experiments">Experiments</h2>
+  <h2 class="section-label" id="studies">Studies</h2>
 
   <div class="experiment-list">
     {projects.map((project) => (
@@ -33,7 +33,7 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
           </a>
           <p>{project.data.thesis}</p>
           <div class="experiment-links">
-            <a href={`/projects/${projectSlug(project.id)}/`}>View experiment <span aria-hidden="true">→</span></a>
+            <a href={`/projects/${projectSlug(project.id)}/`}>View study <span aria-hidden="true">→</span></a>
           </div>
         </div>
       </div>
@@ -45,7 +45,6 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
   <ul class="links">
     <li><a href="mailto:sol@solnicol.com">sol@solnicol.com</a></li>
     <li><a href="https://www.linkedin.com/in/solnicol/">LinkedIn</a></li>
-    <li><a href="https://github.com/solnicol">GitHub</a></li>
     <li><a href="https://x.com/SolNicol_">X</a></li>
   </ul>
 </SiteLayout>

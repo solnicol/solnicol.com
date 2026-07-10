@@ -44,7 +44,6 @@ const ogImage = new URL("/og-flat-white.jpg", Astro.site);
       <header class="essay-head">
         <p class="essay-kicker">Mixing</p>
         <h1>Flat White</h1>
-        <p class="essay-sub">A small model of mixing</p>
         <p class="essay-intro">
           Watch the heart fold, disperse, then settle into uniformity
         </p>
@@ -141,13 +140,6 @@ const ogImage = new URL("/og-flat-white.jpg", Astro.site);
     color: oklch(0.96 0.02 85);
   }
 
-  .essay-sub {
-    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
-    line-height: 1.35;
-    color: oklch(0.88 0.025 80);
-    max-width: 34ch;
-  }
-
   .essay-intro {
     font-family: "Geist Mono Variable", monospace;
     font-size: 0.9rem;
@@ -195,5 +187,11 @@ const ogImage = new URL("/og-flat-white.jpg", Astro.site);
   .noscript a,
   .essay a {
     color: oklch(0.96 0.02 85);
+  }
+
+  @media (max-width: 720px) {
+    .focus-mark {
+      position: absolute;
+    }
   }
 </style>

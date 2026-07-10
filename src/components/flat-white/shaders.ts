@@ -76,8 +76,12 @@ vec2 velocity(vec2 p, float time) {
   // hand-off avoids a mechanical snap and neither direction has a net bias.
   float horizontal = smoothstep(-0.15, 0.15, sin(time * 0.85));
   float vertical = 1.0 - horizontal;
-  v.x += horizontal * 0.82 * sin(p.y * PI * 2.35 + phase * 0.63);
-  v.y += vertical * 0.82 * sin(p.x * PI * 2.10 - phase * 0.71);
+  float horizontalFold = sin(p.y * PI * 3.05 + phase * 0.63);
+  horizontalFold += 0.24 * sin((p.y + p.x * 0.28) * PI * 5.10 - phase * 0.41);
+  float verticalFold = sin(p.x * PI * 2.75 - phase * 0.71);
+  verticalFold += 0.24 * sin((p.x - p.y * 0.31) * PI * 4.70 + phase * 0.47);
+  v.x += horizontal * 0.78 * horizontalFold;
+  v.y += vertical * 0.78 * verticalFold;
 
   // Flow fades before the circular liquid wall, keeping milk in the visible
   // bowl rather than losing it into the corners of the simulation texture.
