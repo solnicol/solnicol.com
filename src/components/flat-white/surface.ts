@@ -27,7 +27,7 @@ export interface Surface {
 }
 
 const SAMPLE_SIZE = 64;
-const SIM_SIZE = 320;
+const SIM_SIZE = 384;
 
 function target(size: number, type: THREE.TextureDataType = THREE.UnsignedByteType) {
   const result = new THREE.WebGLRenderTarget(size, size, {
