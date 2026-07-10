@@ -4,11 +4,11 @@ import { structureStats } from "./structure";
 
 // Tuning. The mixing model is a proxy, not a solver, so these are chosen for
 // legibility of the full mixing progression rather than realism.
-const ORDER_END = 5;
-const FOLD_END = 38;
-const DIFFUSE_START = 38;
-const RELAX_START = 30;
-const TOTAL_SECONDS = 62;
+const ORDER_END = 1.5;
+const FOLD_END = 35;
+const DIFFUSE_START = 35;
+const RELAX_START = 27;
+const TOTAL_SECONDS = 59;
 const CURVE_HZ = 8; // curve points per second
 const CURVE_SPAN = TOTAL_SECONDS;
 const CURVE_N = CURVE_HZ * CURVE_SPAN;
@@ -44,7 +44,9 @@ function smoothRange(from: number, to: number, value: number): number {
 }
 
 function applyTimeline(s: Sim) {
-  const folding = smoothRange(ORDER_END, 24, s.time);
+  const folding = s.time < ORDER_END
+    ? 0
+    : 0.2 + 0.8 * smoothRange(ORDER_END, 21, s.time);
   const relaxing = smoothRange(RELAX_START, FOLD_END, s.time);
   s.advection = folding * (1 - relaxing);
   s.diffusion = 3.2 * smoothRange(DIFFUSE_START + 2, TOTAL_SECONDS, s.time);
