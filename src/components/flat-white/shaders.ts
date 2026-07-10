@@ -82,52 +82,117 @@ float segmentDistance(vec2 p, vec2 a, vec2 b) {
   return length(p - a - ab * h);
 }
 
-// Distance to one leaf of the rosetta. The leaf is a short, curved ribbon
-// running from the stem out into the crema, not a stamped oval.
-float leafDistance(vec2 p, float side, float y, float spread, float lift, float width) {
-  vec2 previous = vec2(0.0, y);
+// Polynomial smooth minimum. Where two milk shapes meet, the foam webs into
+// one fluid joint instead of showing a hard seam between separate strokes.
+float smin(float a, float b, float k) {
+  float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+  return mix(b, a, h) - k * h * (1.0 - h);
+}
+
+// Distance to a curved ribbon stroke defined by a quadratic Bezier through
+// (a, control, b). The ribbon is thickest at its root and tapers to a sharp
+// point at the tip, like milk running out of momentum.
+float strokeDistance(vec2 p, vec2 a, vec2 control, vec2 b, float width) {
+  vec2 previous = a;
   float d = 10.0;
-  for (int i = 1; i <= 6; i++) {
-    float t = float(i) / 6.0;
-    // A quadratic Bezier bows the leaf outward before its tip turns upward.
-    vec2 control = vec2(side * spread * 1.12, y + lift * 0.26);
-    vec2 tip = vec2(side * spread, y + lift);
-    vec2 point = mix(mix(vec2(0.0, y), control, t), mix(control, tip, t), t);
-    d = min(d, segmentDistance(p, previous, point) - width * mix(1.15, 0.45, t));
+  for (int i = 1; i <= 12; i++) {
+    float t = float(i) / 12.0;
+    vec2 point = mix(mix(a, control, t), mix(control, b, t), t);
+    // Continuous thinning along the run — thick at the root, sharp at the tip.
+    float w = width * smoothstep(1.0, 0.4, t);
+    d = min(d, segmentDistance(p, previous, point) - w);
     previous = point;
   }
   return d;
 }
 
-// A poured rosetta is a stack of paired leaves around a narrow stem, finished
-// with a small heart. All shapes remain in material space, so stirring can
-// stretch the whole pour instead of tearing a decal from the coffee.
+// Distance to a curved ribbon along a cubic Bezier (a, b, c, e). A cubic is
+// needed for the wings: they carry an S-shaped sweep the quadratic cannot make
+// — out and low, then up the outside. The ribbon is full-width at its root and
+// tapers to a sharp point at the free tip, like a single poured stroke.
+float cubicStroke(vec2 p, vec2 a, vec2 b, vec2 c, vec2 e, float width) {
+  vec2 previous = a;
+  float dist = 10.0;
+  for (int i = 1; i <= 16; i++) {
+    float t = float(i) / 16.0;
+    vec2 ab = mix(a, b, t), bc = mix(b, c, t), cd = mix(c, e, t);
+    vec2 abc = mix(ab, bc, t), bcd = mix(bc, cd, t);
+    vec2 point = mix(abc, bcd, t);
+    // A continuous taper over the final 45% of the stroke thins the ribbon
+    // gradually — late enough that the rise keeps its weight, smooth enough
+    // that no needle sprouts from a blunt cap. The small negative bite at
+    // the extreme tip keeps milkAt's ~0.014 render threshold from drawing the
+    // bare centerline as a wire past the point where the taper reaches zero.
+    float w = width * smoothstep(1.0, 0.7, t) - 0.024 * smoothstep(0.8, 1.0, t);
+    dist = min(dist, segmentDistance(p, previous, point) - w);
+    previous = point;
+  }
+  return dist;
+}
+
+// A rosetta is a central feather flanked by open wings, not a body of nested
+// rings. A fern frond runs the full height — paired barbs sweeping up and out
+// along a central vein down to a tail point — and on each side a few long
+// strokes spring from the base, sweep outward and low, then curl up the
+// outside and hook their tips back in toward the heart. The wreath stays OPEN
+// over the top, where the heart sits. Everything is in material space, so
+// stirring stretches the whole gesture instead of tearing a decal free.
 float rosettaField(vec2 q) {
-  q += (vec2(vnoise(q * 3.4 + 7.3), vnoise(q * 3.4 + 2.9)) - 0.5) * 0.012;
+  // Domain warp: a low-frequency perturbation of the coordinates before the SDF
+  // gives every edge organic wiggle instead of smooth Bezier contours; a finer
+  // octave adds the micro-turbulence of two fluids meeting.
+  q += (vec2(vnoise(q * 2.3 + 11.0), vnoise(q * 2.3 + 27.0)) - 0.5) * 0.032;
+  q += (vec2(vnoise(q * 6.0 + 3.0), vnoise(q * 6.0 + 9.0)) - 0.5) * 0.010;
   float d = 10.0;
 
-  for (int i = 0; i < 12; i++) {
-    float t = (float(i) + 0.45) / 12.0;
-    float y = -0.57 + t * 0.98;
-    float spread = 0.46 * sin(t * 3.14159) * (0.92 + 0.08 * sin(t * 9.0));
-    float lift = mix(0.19, 0.13, t);
-    float width = mix(0.047, 0.022, t);
-    d = min(d, leafDistance(q, -1.0, y, spread, lift, width));
-    d = min(d, leafDistance(q, 1.0, y, spread, lift, width));
+  // Side wings: open J-shaped sweeps rooted ON the spine. Each leaves its root,
+  // dips out and low, rounds up the outside, and ends free in open space — the
+  // tip never returns to the axis. The lower a wing roots on the spine, the
+  // further out and higher up it sweeps, so the bottom leaves cradle the inner
+  // ones. Roots melt into the spine through the smooth minimum.
+  // One family of leaves, one mechanism. Every leaf roots exactly on the
+  // central axis and grows out of the spine; the only thing that changes down
+  // the stem is scale. Near the heart the bulge and sweep are tiny, giving
+  // tight V-barbs that read as the feather; toward the base they grow into
+  // the massive crescents that wrap up and cradle everything inside.
+  const int LEAVES = 15;
+  for (int i = 0; i < LEAVES; i++) {
+    float t = float(i) / float(LEAVES - 1); // 0 top/youngest .. 1 bottom/oldest
+    float j = hash(vec2(float(i), 5.1)) - 0.5;
+    float rootY = mix(0.28, -0.48, t) + j * 0.01;
+    // A gentle ramp grades the leaves smoothly from tucked-and-tight up top to
+    // wide and sweeping at the base — one organism, no jump in scale.
+    float bulge = mix(0.07, 0.76, pow(t, 1.3)) * (1.0 + 0.03 * j);
+    float dip = mix(-0.03, 0.10, t); // young leaves rise at once; old ones dive low first
+    // The tip envelope still climbs superlinearly (so no picket-fence crown),
+    // but the outer sweeps get real vertical room: they climb the sides to
+    // frame the spine's mid-section before hooking inward, pulling the
+    // silhouette from a squat bowl back into a tall oval.
+    float tipY = mix(rootY + 0.12, mix(0.0, 0.52, pow(t, 1.7)) + j * 0.015, smoothstep(0.0, 0.45, t));
+    // Tips finish well inside the bulge, so the outer crescents hook back in
+    // toward the axis and cradle the heart instead of fanning open.
+    float tipX = mix(0.05, 0.34, pow(t, 1.5));
+    float w = mix(0.014, 0.030, t);
+    // The high shoulder on p2 makes the final leg of the curve mostly
+    // horizontal, so the visible tip actually curls inward instead of
+    // ending as a vertical stub.
+    vec2 p1 = vec2(bulge * 0.85, rootY - dip);
+    vec2 p2 = vec2(bulge, mix(rootY, tipY, 0.7));
+    vec2 p3 = vec2(tipX, tipY);
+    d = smin(d, cubicStroke(q, vec2(0.0, rootY), p1, p2, p3, w), 0.02);
+    d = smin(d, cubicStroke(q, vec2(0.0, rootY), vec2(-p1.x, p1.y), vec2(-p2.x, p2.y), vec2(-p3.x, p3.y), w), 0.02);
   }
 
-  // The pull through the middle joins the leaves into one poured gesture.
-  float stem = abs(q.x + 0.008 * sin(q.y * 18.0)) - 0.018;
-  float stemMask = max(abs(q.y + 0.05) - 0.62, stem);
-  d = min(d, stemMask);
+  // The frond's central vein, tapering to the tail point.
+  d = smin(d, strokeDistance(q, vec2(0.0, 0.29), vec2(0.006, -0.08), vec2(0.0, -0.51), 0.014), 0.025);
 
-  // The top finish is a small heart, not a separate emblem.
-  vec2 h = q - vec2(0.0, 0.46);
-  h.x *= 0.78;
-  h.y -= 0.01;
-  h.y -= 0.46 * sqrt(abs(h.x));
-  h.y += 0.08 * exp(-h.x * h.x * 26.0);
-  d = min(d, length(h) - 0.19);
+  // Pointed tulip heart crowning the frond, melting into the vein top.
+  vec2 h = q - vec2(0.0, 0.44);
+  h.x *= 0.82;
+  h.y *= 0.86;
+  h.y -= 0.40 * sqrt(abs(h.x));
+  h.y += 0.06 * exp(-h.x * h.x * 34.0);
+  d = smin(d, length(h) - 0.145, 0.02);
   return d;
 }
 
@@ -218,7 +283,10 @@ void main() {
   vec2 q = materialPoint(p);
   vec2 flowDir = rosettaFlow(q);
   vec2 flowNormal = vec2(-flowDir.y, flowDir.x);
-  vec2 flowDomain = q + flowDir * (fbm(q * 7.0) - 0.5) * 0.16;
+  // Where the foam is thick, the crema underneath was physically shoved out
+  // of the way, so its flow domain is pulled back along the same direction
+  // rather than sitting untouched under a transparent white shape.
+  vec2 flowDomain = q + flowDir * (fbm(q * 7.0) - 0.5) * 0.16 - flowDir * m * 0.16;
   float cremaFlow = fbm(vec2(dot(flowDomain, flowDir) * 15.0, dot(flowDomain, flowNormal) * 8.0));
   float tiger = 0.5 + 0.5 * sin(dot(flowDomain, flowNormal) * 48.0 + cremaFlow * 11.0);
   float cremaShade = 0.26 + 0.28 * cremaFlow + 0.13 * tiger;
@@ -234,8 +302,8 @@ void main() {
 
   // A dark displaced-crema halo sits just outside the foam, not across the
   // whole blurred edge. It gives each leaf pressure against the coffee.
-  float halo = smoothstep(0.08, 0.72, bleed) * (1.0 - smoothstep(0.28, 0.78, m));
-  col = mix(col, CREMA * 0.72, halo * (0.42 + 0.28 * cremaFlow));
+  float halo = smoothstep(0.06, 0.68, bleed) * (1.0 - smoothstep(0.28, 0.78, m));
+  col = mix(col, CREMA * 0.58, halo * (0.5 + 0.35 * cremaFlow));
 
   // A fine normal from the milk field breaks the highlight into a velvety
   // surface instead of leaving a uniform digital disk.
