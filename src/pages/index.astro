@@ -101,54 +101,6 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
     align-items: baseline;
   }
 
-  .glyph-swap {
-    display: inline-grid;
-    min-width: 1.19em;
-    color: inherit;
-    perspective: 0.9em;
-  }
-
-  .glyph-name,
-  .glyph-code {
-    grid-area: 1 / 1;
-    backface-visibility: hidden;
-    transform-origin: center 58%;
-    transition:
-      opacity 420ms var(--ease-out),
-      transform 420ms var(--ease-out);
-    will-change: opacity, transform;
-  }
-
-  .glyph-code {
-    color: var(--signal);
-    background: linear-gradient(
-      135deg,
-      oklch(55% 0.12 72) 0%,
-      oklch(75% 0.14 82) 25%,
-      oklch(92% 0.08 88) 50%,
-      oklch(70% 0.15 80) 75%,
-      oklch(48% 0.13 70) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-variant-numeric: tabular-nums;
-    opacity: 0;
-    transform: rotateX(74deg) translateY(0.035em);
-  }
-
-  @media (hover: hover) {
-    .hero h1:hover .glyph-name {
-      opacity: 0;
-      transform: rotateX(-74deg) translateY(-0.035em);
-    }
-
-    .hero h1:hover .glyph-code {
-      opacity: 1;
-      transform: rotateX(0deg) translateY(0);
-    }
-  }
-
   .tagline {
     font-size: 1.42rem;
     line-height: 1.45;
@@ -290,6 +242,7 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
   @media (prefers-reduced-motion: reduce) {
     .glyph-name,
     .glyph-code {
+      animation: none !important;
       transition: none !important;
       transform: none !important;
     }
@@ -311,9 +264,12 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
     backface-visibility: hidden;
     transform-origin: center 58%;
     transition:
-      opacity 420ms var(--ease-out),
-      transform 420ms var(--ease-out);
-    will-change: opacity, transform;
+      opacity 340ms var(--ease-out),
+      transform 340ms var(--ease-out);
+  }
+
+  .hero .glyph-name {
+    animation: revealName 1.6s var(--ease-out) 800ms backwards;
   }
 
   .hero .glyph-code {
@@ -329,15 +285,55 @@ const projectSlug = (id: string) => id.replace(/\.mdx?$/, "");
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    background-size: 180% 180%;
     font-variant-numeric: tabular-nums;
     opacity: 0;
-    transform: rotateX(74deg) translateY(0.035em);
+    transform: rotateX(58deg) translateY(0.025em);
+    animation: revealCode 1.6s var(--ease-out) 800ms backwards;
+  }
+
+  @keyframes revealName {
+    0%, 100% {
+      opacity: 1;
+      transform: rotateX(0deg) translateY(0);
+    }
+    20%, 60% {
+      opacity: 0;
+      transform: rotateX(-58deg) translateY(-0.025em);
+    }
+    80% {
+      opacity: 1;
+      transform: rotateX(0deg) translateY(0);
+    }
+  }
+
+  @keyframes revealCode {
+    0%, 100% {
+      opacity: 0;
+      transform: rotateX(58deg) translateY(0.025em);
+      background-position: 0% 50%;
+    }
+    20% {
+      opacity: 1;
+      transform: rotateX(0deg) translateY(0);
+      background-position: 10% 50%;
+    }
+    60% {
+      opacity: 1;
+      transform: rotateX(0deg) translateY(0);
+      background-position: 90% 50%;
+    }
+    80% {
+      opacity: 0;
+      transform: rotateX(58deg) translateY(0.025em);
+      background-position: 100% 50%;
+    }
   }
 
   @media (hover: hover) {
     .hero h1:hover .glyph-name {
       opacity: 0;
-      transform: rotateX(-74deg) translateY(-0.035em);
+      transform: rotateX(-58deg) translateY(-0.025em);
     }
 
     .hero h1:hover .glyph-code {
