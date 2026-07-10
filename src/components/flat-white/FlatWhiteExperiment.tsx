@@ -4,23 +4,20 @@ import { structureStats } from "./structure";
 
 // Tuning. The mixing model is a proxy, not a solver, so these are chosen for
 // legibility of the full mixing progression rather than realism.
-const DIFFUSE_SECONDS = 34; // order → uniform once stirring has begun
-const WIND_FULL = 7; // winding (radians) that reads as fully structured
-const WIND_MAX = 14; // clamp so filaments stay broad and legible
-const CURVE_HZ = 12; // curve points per second
-const CURVE_SPAN = 22; // seconds held in the curve window
+const ORDER_END = 5;
+const FOLD_END = 38;
+const DIFFUSE_START = 38;
+const RELAX_START = 30;
+const TOTAL_SECONDS = 62;
+const CURVE_HZ = 8; // curve points per second
+const CURVE_SPAN = TOTAL_SECONDS;
 const CURVE_N = CURVE_HZ * CURVE_SPAN;
 const MEASURE_INTERVAL = 0.5; // seconds between surface readbacks
 
 interface Sim {
-  wind: number;
-  diffuse: number;
-  energy: number;
-  pointer: [number, number];
+  advection: number;
+  diffusion: number;
   time: number;
-  started: boolean;
-  dragging: boolean;
-  lastAngle: number | null;
   clock: number; // performance.now of last frame
   curveAcc: number; // seconds accumulated toward the next curve point
   measureAcc: number; // seconds accumulated toward the next readback
@@ -30,20 +27,34 @@ interface Sim {
 
 function freshSim(): Sim {
   return {
-    wind: 0,
-    diffuse: 0,
-    energy: 0,
-    pointer: [0, 0],
+    advection: 0,
+    diffusion: 0,
     time: 0,
-    started: false,
-    dragging: false,
-    lastAngle: null,
     clock: 0,
     curveAcc: 0,
     measureAcc: 0,
     structure: 0,
     structureTarget: 0,
   };
+}
+
+function smoothRange(from: number, to: number, value: number): number {
+  const x = Math.min(1, Math.max(0, (value - from) / (to - from)));
+  return x * x * (3 - 2 * x);
+}
+
+function applyTimeline(s: Sim) {
+  const folding = smoothRange(ORDER_END, 24, s.time);
+  const relaxing = smoothRange(RELAX_START, FOLD_END, s.time);
+  s.advection = folding * (1 - relaxing);
+  s.diffusion = 3.2 * smoothRange(DIFFUSE_START + 2, TOTAL_SECONDS, s.time);
+}
+
+function phaseOf(time: number): string {
+  if (time < ORDER_END) return "Order";
+  if (time < FOLD_END) return "Folding";
+  if (time < TOTAL_SECONDS - 4) return "Diffusion";
+  return "Uniformity";
 }
 
 export default function FlatWhiteExperiment({ embedded = false }: { embedded?: boolean }) {
@@ -54,9 +65,10 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   const historyRef = useRef<number[]>([]);
   const valueRef = useRef<HTMLSpanElement>(null);
   const pathRef = useRef<SVGPolylineElement>(null);
+  const phaseRef = useRef<HTMLSpanElement>(null);
+  const activeRef = useRef(true);
 
   const [paused, setPaused] = useState(false);
-  const [stirred, setStirred] = useState(false);
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
 
@@ -66,12 +78,11 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   ).current;
 
   // Fallback only: if the WebGL readback ever fails, the curve degrades to
-  // this pointer-derived estimate instead of dying. The real score comes
+  // this timeline-derived estimate instead of dying. The real score comes
   // from the rendered pixels via structureScore.
   const structureProxy = useCallback((s: Sim): number => {
-    const windNorm = Math.min(Math.abs(s.wind) / WIND_FULL, 1);
-    const live = Math.min(s.energy * 0.25, 0.2);
-    return Math.max(0, Math.min(1, (windNorm + live) * (1 - s.diffuse)));
+    const remaining = 1 - smoothRange(RELAX_START, TOTAL_SECONDS, s.time);
+    return Math.max(0, Math.min(1, s.advection * remaining));
   }, []);
 
   const fallbackRef = useRef(false);
@@ -79,10 +90,6 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   const uniformsOf = useCallback(
     (s: Sim): SurfaceUniforms => ({
       time: s.time,
-      wind: s.wind,
-      diffuse: s.diffuse,
-      energy: s.energy,
-      pointer: s.pointer,
       reduced: reduced ? 1 : 0,
     }),
     [reduced]
@@ -113,6 +120,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
       if (valueRef.current) {
         valueRef.current.textContent = `${Math.round(s.structure * 100)}%`;
       }
+      if (phaseRef.current) phaseRef.current.textContent = phaseOf(s.time);
       const path = pathRef.current;
       const h = historyRef.current;
       if (path) {
@@ -140,20 +148,20 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     const dt = s.clock ? Math.min((now - s.clock) / 1000, 0.05) : 0;
     s.clock = now;
 
-    if (!pausedRef.current) {
-      if (!reduced) s.time += dt;
-      // Energy fades fast; winding relaxes very slowly.
-      s.energy *= Math.exp(-dt * 3.2);
-      s.wind *= Math.exp(-dt * 0.06);
-      if (s.started && s.diffuse < 1) {
-        const rate = reduced ? dt / (DIFFUSE_SECONDS * 2.5) : dt / DIFFUSE_SECONDS;
-        s.diffuse = Math.min(1, s.diffuse + rate);
-      }
+    if (!pausedRef.current && activeRef.current && !reduced) {
+      s.time = Math.min(TOTAL_SECONDS, s.time + dt);
+      applyTimeline(s);
+      surface.step({
+        time: s.time,
+        dt,
+        advection: s.advection,
+        diffusion: s.diffusion,
+      });
     }
 
     // Measure the surface at a fixed cadence, then ease the displayed value
     // toward the latest reading between readbacks.
-    if (!pausedRef.current) {
+    if (!pausedRef.current && activeRef.current && !reduced) {
       s.measureAcc += dt;
       if (s.measureAcc >= MEASURE_INTERVAL) {
         s.measureAcc = 0;
@@ -167,7 +175,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     }
 
     // Append to the curve at a fixed rate regardless of frame rate.
-    if (!pausedRef.current) {
+    if (!pausedRef.current && activeRef.current && !reduced) {
       s.curveAcc += dt;
       const interval = 1 / CURVE_HZ;
       while (s.curveAcc >= interval) {
@@ -181,12 +189,12 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     surface.render(uniformsOf(s));
     paint(s);
 
-    // Keep looping only while something is actually changing.
+    // The sequence is one-shot: the final uniform surface consumes no frames.
     const busy =
       !pausedRef.current &&
-      (s.dragging ||
-        s.energy > 0.002 ||
-        (s.started && s.diffuse < 1));
+      activeRef.current &&
+      !reduced &&
+      s.time < TOTAL_SECONDS;
     if (busy) {
       rafRef.current = requestAnimationFrame(frame);
     } else {
@@ -195,7 +203,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   }, [measureNow, paint, reduced, structureProxy, uniformsOf]);
 
   const ensureLoop = useCallback(() => {
-    if (rafRef.current == null && !pausedRef.current) {
+    if (rafRef.current == null && !pausedRef.current && activeRef.current) {
       simRef.current.clock = 0;
       rafRef.current = requestAnimationFrame(frame);
     }
@@ -230,98 +238,51 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
     };
     fit();
     paint(simRef.current);
+    if (!reduced) ensureLoop();
 
     const ro = new ResizeObserver(fit);
     ro.observe(canvas);
 
+    let intersecting = true;
+    const syncActivity = () => {
+      activeRef.current = intersecting && !document.hidden;
+      if (activeRef.current) ensureLoop();
+    };
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        intersecting = entry.isIntersecting;
+        syncActivity();
+      },
+      { threshold: 0.05 }
+    );
+    io.observe(canvas);
+    document.addEventListener("visibilitychange", syncActivity);
+
     return () => {
       ro.disconnect();
+      io.disconnect();
+      document.removeEventListener("visibilitychange", syncActivity);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       surface.dispose();
       surfaceRef.current = null;
     };
-  }, [measureNow, paint, uniformsOf]);
-
-  // Pointer → stir. Angular motion around the centre winds the pattern;
-  // any motion feeds the live vortex energy.
-  const pointerPos = useCallback((e: React.PointerEvent<HTMLCanvasElement>): [number, number] => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-    return [x, y];
-  }, []);
-
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!surfaceRef.current) return;
-      e.preventDefault();
-      try {
-        e.currentTarget.setPointerCapture(e.pointerId);
-      } catch {
-        // Pointer capture is a nicety (keeps a drag alive off-canvas), not
-        // essential; some pointers reject it.
-      }
-      const s = simRef.current;
-      s.dragging = true;
-      const [x, y] = pointerPos(e);
-      s.pointer = [x, y];
-      s.lastAngle = Math.atan2(y, x);
-      if (!s.started) {
-        s.started = true;
-        setStirred(true);
-      }
-      ensureLoop();
-    },
-    [ensureLoop, pointerPos]
-  );
-
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent<HTMLCanvasElement>) => {
-      const s = simRef.current;
-      if (!s.dragging) return;
-      e.preventDefault();
-      const [x, y] = pointerPos(e);
-      const prev = s.pointer;
-      const dist = Math.hypot(x - prev[0], y - prev[1]);
-      s.pointer = [x, y];
-
-      const angle = Math.atan2(y, x);
-      if (s.lastAngle != null) {
-        let d = angle - s.lastAngle;
-        if (d > Math.PI) d -= 2 * Math.PI;
-        if (d < -Math.PI) d += 2 * Math.PI;
-        s.wind = Math.max(-WIND_MAX, Math.min(WIND_MAX, s.wind + d));
-      }
-      s.lastAngle = angle;
-      s.energy = Math.min(1.2, s.energy + Math.min(dist * 4, 0.6));
-      ensureLoop();
-    },
-    [ensureLoop, pointerPos]
-  );
-
-  const onPointerUp = useCallback((e: React.PointerEvent<HTMLCanvasElement>) => {
-    const s = simRef.current;
-    s.dragging = false;
-    s.lastAngle = null;
-    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    }
-  }, []);
+  }, [ensureLoop, measureNow, paint, reduced, uniformsOf]);
 
   const replay = useCallback(() => {
     simRef.current = freshSim();
     historyRef.current = [];
-    setStirred(false);
     setPaused(false);
     pausedRef.current = false;
     const surface = surfaceRef.current;
     if (surface) {
+      surface.reset();
       surface.render(uniformsOf(simRef.current));
       measureNow(simRef.current, true);
     }
     paint(simRef.current);
-  }, [measureNow, paint, uniformsOf]);
+    ensureLoop();
+  }, [ensureLoop, measureNow, paint, uniformsOf]);
 
   const togglePause = useCallback(() => {
     setPaused((p) => {
@@ -339,16 +300,10 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           ref={canvasRef}
           className="fw-canvas"
           role="img"
-          aria-label="Circular flat white with a rosetta that stirs into filaments before settling into a uniform beige"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          onContextMenu={(e) => e.preventDefault()}
-          draggable={false}
+          aria-label="Circular flat white whose poured heart slowly folds into filaments and diffuses into a uniform surface"
         />
-        <p className="fw-instruction" data-stirred={stirred ? "" : undefined} aria-hidden="true">
-          Stir the pattern
+        <p className="fw-phase" aria-hidden="true">
+          <span ref={phaseRef}>Order</span>
         </p>
       </div>
 
@@ -400,25 +355,18 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
         .fw-stage {
           position: relative;
           width: min(30rem, 100%);
-          margin: 0 auto;
+          margin: 0 auto 0.45rem;
           aspect-ratio: 1;
           overscroll-behavior: contain;
           -webkit-touch-callout: none;
           -webkit-user-select: none;
           user-select: none;
         }
-        /* You stir with a teaspoon, not a hand. Hotspot sits in the bowl. */
         .fw-canvas {
           display: block;
           width: 100%;
           height: 100%;
           border-radius: 50%;
-          cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg transform='rotate(40 16 16)'%3E%3Crect x='14.8' y='2.5' width='2.4' height='14' rx='1.2' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1'/%3E%3Cellipse cx='16' cy='23' rx='4.4' ry='6' fill='%23f2e9d8' stroke='%233a2718' stroke-width='1.2'/%3E%3C/g%3E%3C/svg%3E") 12 21, pointer;
-          touch-action: none;
-          -webkit-tap-highlight-color: transparent;
-          -webkit-touch-callout: none;
-          -webkit-user-select: none;
-          user-select: none;
           box-shadow:
             0 1px 0 oklch(1 0 0 / 0.06) inset,
             0 18px 48px oklch(0 0 0 / 0.45);
@@ -427,9 +375,9 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           background: radial-gradient(circle at 40% 38%, oklch(0.86 0.06 82), oklch(0.36 0.07 55));
         }
 
-        .fw-instruction {
+        .fw-phase {
           position: absolute;
-          bottom: 2.6rem; /* sits on the liquid, clear of the ceramic rim */
+          top: calc(100% + 0.75rem);
           left: 0;
           right: 0;
           text-align: center;
@@ -437,13 +385,12 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           font-size: 0.72rem;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-          color: oklch(0.96 0.02 85);
-          text-shadow: 0 1px 6px oklch(0 0 0 / 0.6);
+          color: var(--fw-dim);
           pointer-events: none;
-          transition: opacity 600ms ease;
         }
-        .fw-instruction[data-stirred] {
-          opacity: 0;
+        .fw-phase span {
+          display: inline-block;
+          min-width: 7.5rem;
         }
 
         .fw-readout {
@@ -530,11 +477,6 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           color: var(--fw-signal);
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          .fw-instruction {
-            transition: none;
-          }
-        }
       `}</style>
     </div>
   );

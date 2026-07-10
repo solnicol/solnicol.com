@@ -1,37 +1,48 @@
-// Three.js renderer for the Flat White surface: one full-screen quad drawn
-// with the fragment shader in ./shaders, its uniforms updated per frame.
-//
-// The renderer is deliberately dumb: it owns the Three objects and pushes a
-// flat bag of uniforms each frame. All model state lives in the component.
-// Swapping the simplified shader for a ping-pong simulation later means
-// changing only this file and ./shaders, not the component.
+// Stateful Three.js surface for the Flat White experiment. Milk concentration
+// is advected and diffused between two fixed-size render targets; a separate
+// display pass colours that material and adds the cup surface.
 
 import * as THREE from "three";
-import { FRAG, VERT } from "./shaders";
+import { DISPLAY_FRAG, SIM_FRAG, VERT } from "./shaders";
 
 export interface SurfaceUniforms {
   time: number;
-  wind: number;
-  diffuse: number;
-  energy: number;
-  pointer: [number, number];
   reduced: number;
 }
 
+export interface SurfaceStep {
+  time: number;
+  dt: number;
+  advection: number;
+  diffusion: number;
+}
+
 export interface Surface {
-  render(u: SurfaceUniforms): void;
-  /** Resize to a CSS pixel box; caps device pixel ratio at 2. */
+  reset(): void;
+  step(v: SurfaceStep): void;
+  render(v: SurfaceUniforms): void;
   resize(cssSize: number): void;
-  /**
-   * Render the current field into a small offscreen target and return its
-   * RGBA bytes. Feeds the visible-structure score, so it samples the same
-   * same coffee surface the visitor sees.
-   */
-  sample(u: SurfaceUniforms): { data: Uint8Array; size: number };
+  sample(v: SurfaceUniforms): { data: Uint8Array; size: number };
   dispose(): void;
 }
 
 const SAMPLE_SIZE = 64;
+const SIM_SIZE = 320;
+
+function target(size: number, type: THREE.TextureDataType = THREE.UnsignedByteType) {
+  const result = new THREE.WebGLRenderTarget(size, size, {
+    type,
+    format: THREE.RGBAFormat,
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    wrapS: THREE.ClampToEdgeWrapping,
+    wrapT: THREE.ClampToEdgeWrapping,
+    depthBuffer: false,
+    stencilBuffer: false,
+  });
+  result.texture.generateMipmaps = false;
+  return result;
+}
 
 export function createSurface(canvas: HTMLCanvasElement): Surface {
   const renderer = new THREE.WebGLRenderer({
@@ -42,66 +53,113 @@ export function createSurface(canvas: HTMLCanvasElement): Surface {
   });
   renderer.setClearColor(0x000000, 0);
 
-  const scene = new THREE.Scene();
-  // The quad already spans clip space, so a plain camera with no transform
-  // is all we need — the vertex shader ignores its matrices.
   const camera = new THREE.Camera();
+  const geometry = new THREE.PlaneGeometry(2, 2);
 
-  const uniforms = {
+  const simUniforms = {
+    uPrevious: { value: null as THREE.Texture | null },
+    uSimRes: { value: new THREE.Vector2(SIM_SIZE, SIM_SIZE) },
+    uTime: { value: 0 },
+    uDt: { value: 0 },
+    uAdvection: { value: 0 },
+    uDiffusion: { value: 0 },
+    uSeed: { value: 1 },
+  };
+  const simMaterial = new THREE.ShaderMaterial({
+    vertexShader: VERT,
+    fragmentShader: SIM_FRAG,
+    uniforms: simUniforms,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const simScene = new THREE.Scene();
+  const simMesh = new THREE.Mesh(geometry, simMaterial);
+  simScene.add(simMesh);
+
+  let read = target(SIM_SIZE, THREE.HalfFloatType);
+  let write = target(SIM_SIZE, THREE.HalfFloatType);
+
+  const displayUniforms = {
+    uMilk: { value: read.texture },
     uRes: { value: new THREE.Vector2(1, 1) },
     uTime: { value: 0 },
-    uWind: { value: 0 },
-    uDiffuse: { value: 0 },
-    uEnergy: { value: 0 },
-    uPointer: { value: new THREE.Vector2(0, 0) },
     uReduced: { value: 0 },
   };
-
-  const material = new THREE.ShaderMaterial({
+  const displayMaterial = new THREE.ShaderMaterial({
     vertexShader: VERT,
-    fragmentShader: FRAG,
-    uniforms,
+    fragmentShader: DISPLAY_FRAG,
+    uniforms: displayUniforms,
     transparent: true,
     depthTest: false,
     depthWrite: false,
   });
+  const displayScene = new THREE.Scene();
+  const displayMesh = new THREE.Mesh(geometry, displayMaterial);
+  displayScene.add(displayMesh);
 
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-  scene.add(mesh);
-
-  // Offscreen target for the structure measurement; created once, read at a
-  // low cadence by the component. 64×64 is plenty for a field this smooth.
-  const sampleTarget = new THREE.WebGLRenderTarget(SAMPLE_SIZE, SAMPLE_SIZE, {
-    depthBuffer: false,
-    stencilBuffer: false,
-  });
+  const sampleTarget = target(SAMPLE_SIZE);
   const samplePixels = new Uint8Array(SAMPLE_SIZE * SAMPLE_SIZE * 4);
 
-  const setUniforms = (v: SurfaceUniforms) => {
-    uniforms.uTime.value = v.time;
-    uniforms.uWind.value = v.wind;
-    uniforms.uDiffuse.value = v.diffuse;
-    uniforms.uEnergy.value = v.energy;
-    uniforms.uPointer.value.set(v.pointer[0], v.pointer[1]);
-    uniforms.uReduced.value = v.reduced;
+  const swap = () => {
+    const previous = read;
+    read = write;
+    write = previous;
+    displayUniforms.uMilk.value = read.texture;
   };
 
+  const drawSimulation = () => {
+    renderer.setRenderTarget(write);
+    renderer.render(simScene, camera);
+    renderer.setRenderTarget(null);
+    swap();
+  };
+
+  const setDisplay = (v: SurfaceUniforms) => {
+    displayUniforms.uTime.value = v.time;
+    displayUniforms.uReduced.value = v.reduced;
+  };
+
+  const reset = () => {
+    simUniforms.uSeed.value = 1;
+    simUniforms.uPrevious.value = read.texture;
+    drawSimulation();
+    // Seed both targets so replay never exposes stale material during the
+    // first back-trace.
+    simUniforms.uPrevious.value = read.texture;
+    drawSimulation();
+    simUniforms.uSeed.value = 0;
+  };
+
+  reset();
+
   return {
+    reset,
+    step(v: SurfaceStep) {
+      if (v.dt <= 0) return;
+      simUniforms.uPrevious.value = read.texture;
+      simUniforms.uTime.value = v.time;
+      simUniforms.uDt.value = v.dt;
+      simUniforms.uAdvection.value = v.advection;
+      simUniforms.uDiffusion.value = v.diffusion;
+      simUniforms.uSeed.value = 0;
+      drawSimulation();
+    },
     resize(cssSize: number) {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       renderer.setPixelRatio(dpr);
       renderer.setSize(cssSize, cssSize, false);
       const px = Math.max(1, Math.round(cssSize * dpr));
-      uniforms.uRes.value.set(px, px);
+      displayUniforms.uRes.value.set(px, px);
     },
     render(v: SurfaceUniforms) {
-      setUniforms(v);
-      renderer.render(scene, camera);
+      setDisplay(v);
+      renderer.setRenderTarget(null);
+      renderer.render(displayScene, camera);
     },
     sample(v: SurfaceUniforms) {
-      setUniforms(v);
+      setDisplay(v);
       renderer.setRenderTarget(sampleTarget);
-      renderer.render(scene, camera);
+      renderer.render(displayScene, camera);
       renderer.setRenderTarget(null);
       renderer.readRenderTargetPixels(
         sampleTarget, 0, 0, SAMPLE_SIZE, SAMPLE_SIZE, samplePixels
@@ -109,9 +167,12 @@ export function createSurface(canvas: HTMLCanvasElement): Surface {
       return { data: samplePixels, size: SAMPLE_SIZE };
     },
     dispose() {
+      read.dispose();
+      write.dispose();
       sampleTarget.dispose();
-      mesh.geometry.dispose();
-      material.dispose();
+      geometry.dispose();
+      simMaterial.dispose();
+      displayMaterial.dispose();
       renderer.dispose();
     },
   };
