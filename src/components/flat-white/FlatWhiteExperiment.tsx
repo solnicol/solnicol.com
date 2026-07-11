@@ -4,10 +4,9 @@ import { structureStats } from "./structure";
 
 // Tuning. The mixing model is a proxy, not a solver, so these are chosen for
 // legibility of the full mixing progression rather than realism.
-const ORDER_END = 1.5;
-const FOLD_END = 35;
-const DIFFUSE_START = 35;
-const RELAX_START = 27;
+const FLOW_PHASE_END = 3;
+const FLOW_DECAY_END = 35;
+const DIFFUSE_START = 29;
 const TOTAL_SECONDS = 59;
 const CURVE_HZ = 8; // curve points per second
 const CURVE_SPAN = TOTAL_SECONDS;
@@ -44,17 +43,17 @@ function smoothRange(from: number, to: number, value: number): number {
 }
 
 function applyTimeline(s: Sim) {
-  const folding = s.time < ORDER_END
-    ? 0
-    : 0.2 + 0.8 * smoothRange(ORDER_END, 21, s.time);
-  const relaxing = smoothRange(RELAX_START, FOLD_END, s.time);
-  s.advection = folding * (1 - relaxing);
-  s.diffusion = 3.2 * smoothRange(DIFFUSE_START + 2, TOTAL_SECONDS, s.time);
+  // The heart is the end of the pour, not a motionless initial condition.
+  // Residual circulation begins strongest and decays as viscosity dissipates
+  // it; diffusion starts to overlap once that flow has made fine boundaries.
+  const flowRemaining = 1 - smoothRange(0, FLOW_DECAY_END, s.time);
+  s.advection = 0.52 * Math.pow(flowRemaining, 0.15);
+  s.diffusion = 3.2 * smoothRange(DIFFUSE_START, TOTAL_SECONDS, s.time);
 }
 
 function phaseOf(time: number): string {
-  if (time < ORDER_END) return "Order";
-  if (time < FOLD_END) return "Folding";
+  if (time < FLOW_PHASE_END) return "Flow";
+  if (time < FLOW_DECAY_END) return "Folding";
   if (time < TOTAL_SECONDS - 4) return "Diffusion";
   return "Uniformity";
 }
@@ -83,8 +82,9 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   // this timeline-derived estimate instead of dying. The real score comes
   // from the rendered pixels via structureScore.
   const structureProxy = useCallback((s: Sim): number => {
-    const remaining = 1 - smoothRange(RELAX_START, TOTAL_SECONDS, s.time);
-    return Math.max(0, Math.min(1, s.advection * remaining));
+    const generated = smoothRange(0, 22, s.time);
+    const remaining = 1 - smoothRange(DIFFUSE_START, TOTAL_SECONDS, s.time);
+    return Math.max(0, Math.min(1, generated * remaining));
   }, []);
 
   const fallbackRef = useRef(false);
@@ -305,13 +305,13 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           aria-label="Circular flat white whose poured heart slowly folds into filaments and diffuses into a uniform surface"
         />
         <p className="fw-phase" aria-hidden="true">
-          <span ref={phaseRef}>Order</span>
+          <span ref={phaseRef}>Flow</span>
         </p>
       </div>
 
       <div className="fw-readout">
         <div className="fw-curve" aria-hidden="true">
-          <span className="fw-curve-label">Structure</span>
+          <span className="fw-curve-label">Visible structure</span>
           <svg className="fw-curve-plot" viewBox="0 0 100 34" preserveAspectRatio="none">
             <line className="fw-curve-base" x1="0" y1="32" x2="100" y2="32" />
             <polyline ref={pathRef} className="fw-curve-line" points="" />

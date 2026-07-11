@@ -1,7 +1,7 @@
 // GLSL for the Flat White experiment.
 //
 // The simulation stores milk concentration in a ping-pong texture. Each step
-// back-traces that material through an alternating, near-zero-net-circulation
+// back-traces that material through a transient, near-zero-net-circulation
 // velocity field, then applies a small diffusion stencil. The display shader
 // colours the resulting material and adds the crema, foam and ceramic surface.
 
@@ -60,28 +60,44 @@ vec2 vortex(vec2 p, vec2 centre, float spin, float radius) {
   return vec2(-d.y, d.x) * spin * falloff;
 }
 
-// Two counter-rotating vortices exchange dominance while gentle transverse
-// shears change direction. The cup therefore folds internally without acquiring
-// the persistent clockwise or anti-clockwise motion of a spoon-driven vortex.
+// Residual circulation changes orientation twice as the pour settles. Each
+// hand-off folds material stretched by the previous field, but unlike periodic
+// stirring the sequence never cycles back or acquires a global direction.
 vec2 velocity(vec2 p, float time) {
-  float phase = time * 0.23;
-  vec2 c1 = vec2(-0.30 + 0.12 * sin(phase * 0.71), 0.15 * cos(phase * 0.93));
-  vec2 c2 = vec2( 0.30 + 0.12 * cos(phase * 0.67),-0.15 * sin(phase * 0.89));
-  float exchange = 0.74 + 0.26 * sin(phase * 0.57);
-  vec2 v = vortex(p, c1,  0.34 * exchange, 0.52);
-  v += vortex(p, c2, -0.34 * (1.48 - exchange), 0.52);
+  float firstTurn = smoothstep(7.0, 12.0, time);
+  float secondTurn = smoothstep(16.0, 23.0, time);
 
-  // Alternating transverse shears are non-commutative: material stretched in
-  // one direction is folded when the orthogonal shear takes over. The smooth
-  // hand-off avoids a mechanical snap and neither direction has a net bias.
-  float horizontal = smoothstep(-0.15, 0.15, sin(time * 0.85));
-  float vertical = 1.0 - horizontal;
-  float horizontalFold = sin(p.y * PI * 3.05 + phase * 0.63);
-  horizontalFold += 0.24 * sin((p.y + p.x * 0.28) * PI * 5.10 - phase * 0.41);
-  float verticalFold = sin(p.x * PI * 2.75 - phase * 0.71);
-  verticalFold += 0.24 * sin((p.x - p.y * 0.31) * PI * 4.70 + phase * 0.47);
-  v.x += horizontal * 0.78 * horizontalFold;
-  v.y += vertical * 0.78 * verticalFold;
+  vec2 c1 = mix(vec2(-0.30, 0.12), vec2(-0.20, -0.17), firstTurn);
+  vec2 c2 = mix(vec2( 0.30,-0.12), vec2( 0.20,  0.17), firstTurn);
+  vec2 v = vortex(p, c1,  0.44, 0.52);
+  v += vortex(p, c2, -0.44, 0.52);
+
+  float weightA = 1.0 - firstTurn;
+  float weightB = firstTurn * (1.0 - secondTurn);
+  float weightC = secondTurn;
+
+  vec2 directionA = normalize(vec2(1.0, 0.28));
+  vec2 directionB = normalize(vec2(-0.32, 1.0));
+  vec2 directionC = normalize(vec2(0.76, 0.65));
+  float positionA = dot(p, vec2(-directionA.y, directionA.x));
+  float positionB = dot(p, vec2(-directionB.y, directionB.x));
+  float positionC = dot(p, vec2(-directionC.y, directionC.x));
+
+  float warpA = (vnoise(vec2(positionA * 2.30, 1.70)) - 0.5) * 1.10;
+  float foldA = sin(positionA * PI * 3.05 + warpA);
+  foldA += 0.18 * sin(positionA * PI * 5.10 - warpA * 0.55);
+  float warpB = (vnoise(vec2(positionB * 2.15, 4.20)) - 0.5) * 1.10;
+  float foldB = sin(positionB * PI * 2.75 - 0.55 + warpB);
+  foldB += 0.18 * sin(positionB * PI * 4.70 + 0.35 - warpB * 0.60);
+  float warpC = (vnoise(vec2(positionC * 2.25, 6.40)) - 0.5) * 1.10;
+  float foldC = sin(positionC * PI * 3.20 + 0.80 + warpC);
+  foldC += 0.18 * sin(positionC * PI * 5.30 - 0.25 - warpC * 0.50);
+
+  v += 0.54 * (
+    weightA * directionA * foldA
+    + weightB * directionB * foldB
+    + weightC * directionC * foldC
+  );
 
   // Flow fades before the circular liquid wall, keeping milk in the visible
   // bowl rather than losing it into the corners of the simulation texture.
