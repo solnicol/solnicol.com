@@ -6,8 +6,7 @@ import { structureStats } from "./structure";
 // legibility of the full mixing progression rather than realism.
 const ORDER_END = 1.5;
 const FOLD_END = 35;
-const DIFFUSE_START = 35;
-const RELAX_START = 27;
+const DIFFUSE_START = 29;
 const TOTAL_SECONDS = 59;
 const CURVE_HZ = 8; // curve points per second
 const CURVE_SPAN = TOTAL_SECONDS;
@@ -44,12 +43,12 @@ function smoothRange(from: number, to: number, value: number): number {
 }
 
 function applyTimeline(s: Sim) {
-  const folding = s.time < ORDER_END
-    ? 0
-    : 0.2 + 0.8 * smoothRange(ORDER_END, 21, s.time);
-  const relaxing = smoothRange(RELAX_START, FOLD_END, s.time);
-  s.advection = folding * (1 - relaxing);
-  s.diffusion = 3.2 * smoothRange(DIFFUSE_START + 2, TOTAL_SECONDS, s.time);
+  // The heart is the end of the pour, not a motionless initial condition.
+  // Residual circulation begins strongest and decays as viscosity dissipates
+  // it; diffusion starts to overlap once that flow has made fine boundaries.
+  const flowRemaining = 1 - smoothRange(0, FOLD_END, s.time);
+  s.advection = 0.52 * Math.pow(flowRemaining, 0.15);
+  s.diffusion = 3.2 * smoothRange(DIFFUSE_START, TOTAL_SECONDS, s.time);
 }
 
 function phaseOf(time: number): string {
@@ -83,8 +82,9 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
   // this timeline-derived estimate instead of dying. The real score comes
   // from the rendered pixels via structureScore.
   const structureProxy = useCallback((s: Sim): number => {
-    const remaining = 1 - smoothRange(RELAX_START, TOTAL_SECONDS, s.time);
-    return Math.max(0, Math.min(1, s.advection * remaining));
+    const generated = smoothRange(0, 22, s.time);
+    const remaining = 1 - smoothRange(DIFFUSE_START, TOTAL_SECONDS, s.time);
+    return Math.max(0, Math.min(1, generated * remaining));
   }, []);
 
   const fallbackRef = useRef(false);
