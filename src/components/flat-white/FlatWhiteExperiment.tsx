@@ -311,7 +311,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
 
       <div className="fw-readout">
         <div className="fw-curve" aria-hidden="true">
-          <span className="fw-curve-label">Structure</span>
+          <span className="fw-curve-label">Visible structure</span>
           <svg className="fw-curve-plot" viewBox="0 0 100 34" preserveAspectRatio="none">
             <line className="fw-curve-base" x1="0" y1="32" x2="100" y2="32" />
             <polyline ref={pathRef} className="fw-curve-line" points="" />
