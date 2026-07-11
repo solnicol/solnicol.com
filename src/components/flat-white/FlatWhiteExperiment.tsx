@@ -4,8 +4,8 @@ import { structureStats } from "./structure";
 
 // Tuning. The mixing model is a proxy, not a solver, so these are chosen for
 // legibility of the full mixing progression rather than realism.
-const ORDER_END = 1.5;
-const FOLD_END = 35;
+const FLOW_PHASE_END = 3;
+const FLOW_DECAY_END = 35;
 const DIFFUSE_START = 29;
 const TOTAL_SECONDS = 59;
 const CURVE_HZ = 8; // curve points per second
@@ -46,14 +46,14 @@ function applyTimeline(s: Sim) {
   // The heart is the end of the pour, not a motionless initial condition.
   // Residual circulation begins strongest and decays as viscosity dissipates
   // it; diffusion starts to overlap once that flow has made fine boundaries.
-  const flowRemaining = 1 - smoothRange(0, FOLD_END, s.time);
+  const flowRemaining = 1 - smoothRange(0, FLOW_DECAY_END, s.time);
   s.advection = 0.52 * Math.pow(flowRemaining, 0.15);
   s.diffusion = 3.2 * smoothRange(DIFFUSE_START, TOTAL_SECONDS, s.time);
 }
 
 function phaseOf(time: number): string {
-  if (time < ORDER_END) return "Order";
-  if (time < FOLD_END) return "Folding";
+  if (time < FLOW_PHASE_END) return "Flow";
+  if (time < FLOW_DECAY_END) return "Folding";
   if (time < TOTAL_SECONDS - 4) return "Diffusion";
   return "Uniformity";
 }
@@ -305,7 +305,7 @@ export default function FlatWhiteExperiment({ embedded = false }: { embedded?: b
           aria-label="Circular flat white whose poured heart slowly folds into filaments and diffuses into a uniform surface"
         />
         <p className="fw-phase" aria-hidden="true">
-          <span ref={phaseRef}>Order</span>
+          <span ref={phaseRef}>Flow</span>
         </p>
       </div>
 
