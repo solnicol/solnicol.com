@@ -15,19 +15,33 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { Content } = await render(project);
 
-// A project opts into a live figure via its `embed` frontmatter key; the
-// hero's CTAs then defer to the figure's title block. Client-hydrated
-// components must be referenced by their static import name (Astro can't
-// hydrate one chosen from a lookup), so each embed is matched by key in the
-// figure below — a new interactive model is a one-line addition there.
 const embed = project.data.embed;
 const hasEmbed = Boolean(embed);
+
+const siteUrl = Astro.site ?? new URL("https://solnicol.com");
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: project.data.title,
+  description: project.data.ogDescription ?? project.data.thesis,
+  url: canonicalUrl.toString(),
+  creator: {
+    "@type": "Person",
+    name: "Sol Nicol",
+  },
+  dateCreated: String(project.data.year),
+  image: new URL(project.data.ogImage ?? "/og.jpg", siteUrl).toString(),
+  keywords: project.data.concepts.join(", "),
+};
 ---
 
 <SiteLayout
   title={project.data.title}
   description={project.data.ogDescription ?? project.data.thesis}
   ogImage={project.data.ogImage}
+  structuredData={structuredData}
+  legacyVisual
 >
   <article class="project-page">
     <header class="project-hero">

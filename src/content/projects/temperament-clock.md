@@ -6,6 +6,9 @@ repoUrl: https://github.com/solnicol/solnicol.com/tree/main/src/components/tempe
 year: 2026
 concepts: [circle of fifths, music theory]
 ogDescription: Hear the gap where the circle of fifths fails to close
+ogImage: /og-temperament-clock.jpg
+previewImage: /og-temperament-clock.jpg
+previewAlt: The Temperament Clock face showing notes arranged around a clock dial
 embed: temperament-clock
 ---
 

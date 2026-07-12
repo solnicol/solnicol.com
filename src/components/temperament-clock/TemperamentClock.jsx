@@ -27,7 +27,7 @@ import {
 // Palettes in OKLCH (perceptually uniform; animations below move only L/C).
 // "dark" is the instrument's own workshop theme (fullscreen route).
 // "blueprint" redraws it in the site's ink so the embedded figure sits on
-// the sheet itself — it inherits the page's custom properties.
+// the sheet itself - it inherits the page's custom properties.
 const THEMES = {
   dark: {
     brass: "oklch(0.728 0.138 89.7)",
@@ -64,7 +64,7 @@ export default function TemperamentClock({ embedded = false }) {
   } = THEMES[embedded ? "blueprint" : "dark"];
   const [now, setNow] = useState(() => new Date());
   const [activeIdx, setActiveIdx] = useState(null);   // face position (mod 12)
-  const [activeStep, setActiveStep] = useState(null); // absolute chain step (0–12)
+  const [activeStep, setActiveStep] = useState(null); // absolute chain step (0-12)
   const [touring, setTouring] = useState(false);
   const [tourAnim, setTourAnim] = useState(null); // { mode, startedAt } while the tour thread is on screen
   const [tourNow, setTourNow] = useState(0);
@@ -85,7 +85,7 @@ export default function TemperamentClock({ embedded = false }) {
   );
 
   // The second hand sweeps via CSS, so the render clock only needs to keep
-  // the digital readout and minute/hour hands honest — 4 Hz, not 60.
+  // the digital readout and minute/hour hands honest - 4 Hz, not 60.
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 250);
     return () => clearInterval(id);
@@ -106,7 +106,7 @@ export default function TemperamentClock({ embedded = false }) {
   const getAudio = useCallback(() => getAudioEngine(audioEngineRef), []);
 
   // Tracked setTimeout: strike flashes and tour teardown must not fire setState
-  // after unmount — same discipline as the audio and guided-sequence teardown.
+  // after unmount - same discipline as the audio and guided-sequence teardown.
   const schedule = useCallback((fn, ms) => {
     const id = setTimeout(fn, ms);
     timersRef.current.push(id);
@@ -160,7 +160,7 @@ export default function TemperamentClock({ embedded = false }) {
     setDyad(null);
   }, []);
 
-  // Unconditional start — the guided sequence needs this so a fifth the user
+  // Unconditional start - the guided sequence needs this so a fifth the user
   // already had held can't toggle the phase silent.
   const startFifth = useCallback(
     (kind) => {
@@ -212,11 +212,11 @@ export default function TemperamentClock({ embedded = false }) {
   };
 
   // A cancelled sequence must not fire late phases into a state that no
-  // longer expects them — same discipline as the audio-engine teardown.
+  // longer expects them - same discipline as the audio-engine teardown.
   useEffect(() => clearGuidedTimers, []);
 
   // Guided first-run sequence: pure fifth locks (3.5 s), tempered fifth beats
-  // (4.5 s — four beat cycles at ≈0.89 Hz), a breath of silence, then the
+  // (4.5 s - four beat cycles at ≈0.89 Hz), a breath of silence, then the
   // spiral tour plays the comma. Clicking again cancels: dyads stop at once;
   // if the tour has already begun it rings out like any tour.
   const hearTheProblem = () => {
@@ -321,7 +321,7 @@ export default function TemperamentClock({ embedded = false }) {
           font-family: 'IBM Plex Mono', ui-monospace, monospace;
           color: ${INK};
         }
-        /* Embedded: the figure is drawn on the sheet itself — no slab, no
+        /* Embedded: the figure is drawn on the sheet itself - no slab, no
            radial vignette, site mono for UI text, square corners below. */
         .page-embedded {
           min-height: 0 !important;
@@ -346,7 +346,7 @@ export default function TemperamentClock({ embedded = false }) {
 
         /* Animated OKLCH, used only where the motion carries meaning: */
 
-        /* 1. The tempered fifth beats at ${BEAT_HZ.toFixed(3)} Hz — the glow's
+        /* 1. The tempered fifth beats at ${BEAT_HZ.toFixed(3)} Hz - the glow's
               L and C oscillate at exactly that computed period. The pure
               fifth holds still: locked sound, locked light. */
         .dyad-pure { fill: ${GLOW_PURE}; }
@@ -356,7 +356,7 @@ export default function TemperamentClock({ embedded = false }) {
           50% { fill: ${BEAT_HI}; }
         }
 
-        /* 2. The hour marker breathes slowly — L rises and settles. */
+        /* 2. The hour marker breathes slowly - L rises and settles. */
         .hour-dot { animation: breathe 4s ease-in-out infinite; }
         @keyframes breathe {
           0%, 100% { fill: ${DOT_LO}; }
@@ -395,7 +395,7 @@ export default function TemperamentClock({ embedded = false }) {
         }
         .btn.active { background: ${BRASS}; color: ${BG}; border-color: ${BRASS}; }
         /* An active button reads as active even when locked out during its
-           own tour — keep its brass full-strength rather than dimming it. */
+           own tour - keep its brass full-strength rather than dimming it. */
         .btn.active:disabled { opacity: 1; }
         /* First-run invitation: primary by brass, not by size or chrome. */
         .btn-invite { border-color: oklch(0.728 0.138 89.7 / 0.65); color: ${BRASS}; }
@@ -425,8 +425,9 @@ export default function TemperamentClock({ embedded = false }) {
         .btn:disabled { opacity: 0.45; cursor: default; }
         .btn:focus-visible { outline: 1px solid ${BRASS}; outline-offset: 3px; }
 
-        .note-hit { cursor: pointer; outline: none; }
-        .note-hit:focus-visible .hit { stroke: oklch(0.728 0.138 89.7 / 0.55); }
+        .note { cursor: pointer; }
+        .note-hit { outline: none; }
+        .note-hit:focus-visible { stroke: oklch(0.728 0.138 89.7 / 0.55); }
 
         .caption { animation: captionIn 0.6s ease; }
         @keyframes captionIn { from { opacity: 0; } to { opacity: 1; } }
@@ -478,22 +479,30 @@ export default function TemperamentClock({ embedded = false }) {
           return (
             <g
               key={n.label}
-              className="note-hit"
-              role="button"
-              tabIndex={0}
-              aria-label={`play ${n.label}`}
+              className="note"
               onClick={() => strike(i, 0, 1.8)}
+            >
+              {isRinging && (
+                <circle className="ring-pulse" cx={x} cy={y} r={26} fill="none" stroke={BRASS} strokeWidth="1" />
+              )}
+              <circle
+                className="hit note-hit"
+                cx={x}
+                cy={y}
+                r={22}
+                fill="transparent"
+                stroke="none"
+                strokeWidth="1"
+                role="button"
+                tabIndex={0}
+                aria-label={`${n.label} note`}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   strike(i, 0, 1.8);
                 }
               }}
-            >
-              {isRinging && (
-                <circle className="ring-pulse" cx={x} cy={y} r={26} fill="none" stroke={BRASS} strokeWidth="1" />
-              )}
-              <circle className="hit" cx={x} cy={y} r={22} fill="transparent" stroke="none" strokeWidth="1" />
+              />
               <text
                 className={`note-label ${isRinging ? "struck" : ""} ${dyadClass}`}
                 x={x}
@@ -526,7 +535,7 @@ export default function TemperamentClock({ embedded = false }) {
                   {n.sub}
                 </text>
               )}
-              {/* Relative minor — the circle of fifths' everyday reference use. */}
+              {/* Relative minor - the circle of fifths' everyday reference use. */}
               <text
                 className="note-label"
                 x={rx}
@@ -553,7 +562,7 @@ export default function TemperamentClock({ embedded = false }) {
             the strikes, then fades. On the circle tour it closes perfectly. On
             the spiral tour the radius grows by the accumulated sharpness of
             pure fifths over 12-TET (1.6 px per cent), so the thread misses its
-            start by the Pythagorean comma — the gap made visible, to scale. */}
+            start by the Pythagorean comma - the gap made visible, to scale. */}
         {tourAnim && (() => {
           // Clamp below at 0: the tour clock starts on the first rAF after launch.
           const clock = prefersReducedMotion ? now.getTime() : tourNow;
@@ -634,18 +643,18 @@ export default function TemperamentClock({ embedded = false }) {
             {currentNote.label}
             {currentNote.sub ? ` / ${currentNote.sub}` : ""}
           </span>
-          {" · "}
-          {currentNote.sig} · relative{" "}
+          <span>{` (${currentNote.sig}, relative `}</span>
           <span className="note-label" style={{ fontSize: 15, fontStyle: "italic", letterSpacing: 0 }}>
             {currentNote.rel}
           </span>
+          <span>)</span>
         </div>
         <div style={{ marginTop: 6, fontSize: 11, color: BRASS, letterSpacing: "0.16em", minHeight: 16 }}>
           {touring && tourAnim?.mode === "spiral" && activeStep !== null && (
             <>
               PURE FIFTH {activeStep}
-              {activeStep > 0 ? ` · +${chainDrift(activeStep).toFixed(2)}¢` : ""}
-              {activeStep === 12 ? " · MISSES C" : ""}
+              {activeStep > 0 ? `: +${chainDrift(activeStep).toFixed(2)}¢` : ""}
+              {activeStep === 12 ? ", MISSES C" : ""}
             </>
           )}
         </div>
@@ -660,7 +669,7 @@ export default function TemperamentClock({ embedded = false }) {
           textAlign: "center",
         }}
       >
-        PYTHAGOREAN COMMA ·{" "}
+        PYTHAGOREAN COMMA: {" "}
         <span style={{ color: BRASS, letterSpacing: "0.04em" }}>
           {PYTHAGOREAN_COMMA_CENTS.toFixed(2)}¢
         </span>
@@ -672,7 +681,7 @@ export default function TemperamentClock({ embedded = false }) {
           onClick={hearTheProblem}
           disabled={touring && !guided}
         >
-          {guided === "spiral" ? "watching the comma…" : guided ? "listening… · tap to stop" : "hear the comma"}
+          {guided === "spiral" ? "watching the comma..." : guided ? "listening, tap to stop" : "hear the comma"}
         </button>
 
         <div className="control-pair">
@@ -722,11 +731,6 @@ export default function TemperamentClock({ embedded = false }) {
         {captionText}
       </div>
 
-      {!embedded && (
-        <footer style={{ marginTop: 10, fontSize: 9, letterSpacing: "0.3em", color: FAINT }}>
-          · MMXXVI ·
-        </footer>
-      )}
     </div>
   );
 }

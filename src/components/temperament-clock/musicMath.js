@@ -34,7 +34,7 @@ export const BEAT_PERIOD_S = 1 / BEAT_HZ;
 
 export const CAPTIONS = {
   invite: "Twelve pure 3:2 fifths overshoot seven octaves\nThe gap is the Pythagorean comma",
-  idle: "Tap any note to hear its 12-TET pitch · the breathing dot marks the hour",
+  idle: "Tap any note to hear its 12-TET pitch. The breathing dot marks the hour",
   // Terse copy for the guided sequence; the longer captions below remain for
   // manual use and take over once the sequence hands off to the spiral tour.
   guidedPure: "Pure fifth: the harmonics lock",
@@ -42,6 +42,6 @@ export const CAPTIONS = {
   guidedSpiral: "Twelve pure fifths miss home by the comma",
   circle: `Twelve fifths, each tempered ${ET_FIFTH_FLATTENING_CENTS.toFixed(2)}¢ narrow of pure 3:2 so the thread closes`,
   spiral: `Twelve pure fifths rising from C2 overshoot seven octaves by ${PYTHAGOREAN_COMMA_CENTS.toFixed(2)}¢`,
-  pure: "Pure fifth · 3:2 where the third harmonic of C meets the second harmonic of G",
-  tempered: `Tempered fifth · 2^(7/12) with a ${BEAT_HZ.toFixed(2)} Hz beat`,
+  pure: "Pure fifth: 3:2 where the third harmonic of C meets the second harmonic of G",
+  tempered: `Tempered fifth: 2^(7/12) with a ${BEAT_HZ.toFixed(2)} Hz beat`,
 };

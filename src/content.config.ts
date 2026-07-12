@@ -13,6 +13,9 @@ const projects = defineCollection({
     ogDescription: z.string().optional(),
     // Site-relative path to a social-card image; falls back to /og.jpg.
     ogImage: z.string().optional(),
+    // Real artefact still used by the homepage study index.
+    previewImage: z.string(),
+    previewAlt: z.string(),
     // Key into the embed registry in projects/[slug].astro. When set, the
     // project renders its live component in place instead of hero CTAs.
     embed: z.string().optional(),
