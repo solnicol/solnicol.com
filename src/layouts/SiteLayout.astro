@@ -6,17 +6,48 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  legacyVisual?: boolean;
 }
 
 const {
   title,
   description = "Making structure visible",
   ogImage: ogImagePath = "/og.jpg",
+  structuredData,
+  legacyVisual = false,
 } = Astro.props;
 
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://www.solnicol.com");
-const pageTitle = title === "Home" ? "Sol Nicol" : `${title} | Sol Nicol`;
-const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
+const siteUrl = Astro.site ?? new URL("https://solnicol.com");
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
+const pageTitle = title === "Home"
+  ? "Sol Nicol | Experiments in design and code"
+  : `${title} | Sol Nicol`;
+const ogImage = new URL(ogImagePath, siteUrl);
+const baseStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Sol Nicol",
+    url: siteUrl.toString(),
+    sameAs: [
+      "https://www.linkedin.com/in/solnicol/",
+      "https://x.com/SolNicol_",
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Sol Nicol",
+    url: siteUrl.toString(),
+    description: "Concept-led experiments in design and code",
+  },
+];
+const pageStructuredData = structuredData
+  ? Array.isArray(structuredData)
+    ? structuredData
+    : [structuredData]
+  : [];
 ---
 
 <!doctype html>
@@ -36,19 +67,24 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="theme-color" content="#002fa7" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script type="application/ld+json" set:html={JSON.stringify([...baseStructuredData, ...pageStructuredData])} />
   </head>
-  <body>
-    <div class="surface">
+  <body class:list={{ "legacy-visual": legacyVisual }}>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class:list={{ surface: true, "legacy-surface": legacyVisual }}>
       <header class="site-header" aria-label="Site header">
-        <a class="site-mark" href="/" aria-label="Sol Nicol home">
-          <span class="mark-sigil" aria-hidden="true" style="display: grid; gap: 0.05rem;">
+        <a class="site-mark" href="/">
+          <span class="mark-sigil" style="display: grid; gap: 0.05rem;">
             <span>&gt;_S01</span>
             <span>NIC01</span>
           </span>
+          <span class="visually-hidden">Sol Nicol home</span>
         </a>
         <nav class="site-nav" aria-label="Primary navigation">
           <a href="/#studies">Studies</a>
@@ -56,7 +92,7 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
         </nav>
       </header>
 
-      <main class="content">
+      <main class="content" id="main-content">
         <slot />
       </main>
 
@@ -69,18 +105,18 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     /*
       Palette: one ground, three inks, one signal.
 
-      Ground — International Klein Blue (#002FA7), hue 263. The sheet.
-      Inks   — white at three lightness steps. The drawing: structure,
+      Ground - International Klein Blue (#002FA7), hue 263. The sheet.
+      Inks   - white at three lightness steps. The drawing: structure,
                wayfinding, prose. All borders are ink at reduced alpha.
-      Signal — gold leaf, hue 97: the opponent of hue 263 on the
-               blue–yellow axis of OKLab, and Klein's own pairing
+      Signal - gold leaf, hue 97: the opponent of hue 263 on the
+               blue-yellow axis of OKLab, and Klein's own pairing
                (IKB / Monogold). Matched to the leaf itself: high
-               lightness, LOW chroma — real gold is pale, its richness
+               lightness, LOW chroma - real gold is pale, its richness
                is sheen, not pigment. Reserved for what is LIVE: sound,
                play, the active thing. Never for wayfinding, never for
                structure. If in doubt, use ink. Contrast on ground
                ≈ 5.7:1 (AA at any size). At display sizes the signal
-               may render as leaf — a gradient of the same metal (see
+               may render as leaf - a gradient of the same metal (see
                small and functional text stays flat.
     */
     --ikb: oklch(0.3785 0.1954 263.23);
@@ -103,6 +139,14 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     --duration-med: 220ms;
     --font-main: "Geist Variable", sans-serif;
     --font-mono: "Geist Mono Variable", monospace;
+    --space-1: 0.5rem;
+    --space-2: 0.75rem;
+    --space-3: 1rem;
+    --space-4: 1.5rem;
+    --space-5: 2rem;
+    --space-6: 3rem;
+    --space-7: 4.5rem;
+    --space-8: 7rem;
   }
 
   html {
@@ -117,7 +161,7 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
 
   body {
     position: relative;
-    min-height: 100vh;
+    min-height: 100dvh;
     background: var(--bg-1);
     color: var(--fg-0);
     font-family: var(--font-main);
@@ -126,7 +170,7 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     -webkit-text-size-adjust: 100%;
-    padding: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1rem, 3vw, 2.5rem);
     display: flex;
     align-items: flex-start;
     justify-content: center;
@@ -137,10 +181,10 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     inset: 0;
     z-index: 0;
     background-image:
-      linear-gradient(oklch(1 0 0 / 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(1 0 0 / 0.045) 1px, transparent 1px),
-      linear-gradient(oklch(1 0 0 / 0.075) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(1 0 0 / 0.075) 1px, transparent 1px);
+      linear-gradient(oklch(1 0 0 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(1 0 0 / 0.035) 1px, transparent 1px),
+      linear-gradient(oklch(1 0 0 / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(1 0 0 / 0.06) 1px, transparent 1px);
     background-position: center;
     background-size:
       1.5rem 1.5rem,
@@ -154,11 +198,11 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
   .surface {
     position: relative;
     z-index: 1;
-    width: min(960px, calc(100vw - 3rem));
-    padding: clamp(1rem, 3vw, 2rem);
+    width: min(1120px, calc(100vw - 2rem));
+    padding: clamp(1rem, 3vw, 2.5rem);
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: var(--space-6);
   }
 
   .surface::before,
@@ -200,19 +244,59 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
   }
 
   a:focus-visible {
-    outline: 1px solid var(--accent);
-    outline-offset: 0.35rem;
+    outline: 2px solid var(--accent);
+    outline-offset: 0.3rem;
     text-decoration-color: transparent;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 10;
+    padding: 0.65rem 0.85rem;
+    background: var(--fg-0);
+    color: var(--bg-0);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transform: translateY(-180%);
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .site-header {
     position: relative;
     display: flex;
-    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
+    min-height: 4rem;
     gap: 1.5rem;
-    padding-bottom: clamp(2rem, 5vw, 3.5rem);
+    padding-bottom: var(--space-4);
+  }
+
+  @media (min-width: 721px) {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      padding-top: var(--space-3);
+      background: var(--bg-0);
+    }
   }
 
   .site-header::after {
@@ -254,7 +338,7 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     text-transform: uppercase;
     letter-spacing: 0.06em;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 1rem;
     justify-content: flex-end;
   }
@@ -273,7 +357,42 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
   .content {
     display: flex;
     flex-direction: column;
+    gap: 0;
+  }
+
+  body.legacy-visual {
+    padding: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  body.legacy-visual .legacy-surface {
+    width: min(960px, calc(100vw - 3rem));
+    padding: clamp(1rem, 3vw, 2rem);
+    gap: 2rem;
+  }
+
+  body.legacy-visual .site-header {
+    position: relative;
+    flex-wrap: wrap;
+    min-height: 0;
+    padding-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  body.legacy-visual .site-nav {
+    flex-wrap: wrap;
+  }
+
+  body.legacy-visual .content {
     gap: 1.8rem;
+  }
+
+  @media (min-width: 721px) {
+    body.legacy-visual .site-header {
+      position: relative;
+      top: auto;
+      z-index: auto;
+      padding-top: 0;
+      background: transparent;
+    }
   }
 
   .section-label {
@@ -469,7 +588,7 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
     text-decoration-color: var(--fg-0);
   }
 
-  /* Selection is live — the one place gold touches prose. */
+  /* Selection is live - the one place gold touches prose. */
   ::selection {
     background: var(--signal);
     color: var(--bg-0);
@@ -506,12 +625,17 @@ const ogImage = new URL(ogImagePath, Astro.site ?? "https://www.solnicol.com");
       padding: clamp(1.5rem, 6vw, 2.5rem);
     }
 
-    .site-header {
+    body.legacy-visual .legacy-surface {
+      width: 100%;
+      padding: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    body.legacy-visual .site-header {
       flex-direction: column;
       align-items: flex-start;
     }
 
-    .site-nav {
+    body.legacy-visual .site-nav {
       justify-content: flex-start;
     }
 

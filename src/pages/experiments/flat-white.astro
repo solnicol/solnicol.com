@@ -35,9 +35,10 @@ const ogImage = new URL("/og-flat-white.jpg", Astro.site);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
-    <a class="focus-mark" href="/" aria-label="Sol Nicol — home">
+    <a class="focus-mark" href="/">
       <span>&gt;_S01</span>
       <span>NIC01</span>
+      <span class="visually-hidden">Sol Nicol home</span>
     </a>
 
     <main class="essay">
@@ -107,6 +108,18 @@ const ogImage = new URL("/og-flat-white.jpg", Astro.site);
     outline: 1px solid oklch(0.93 0.02 82 / 0.55);
     outline-offset: 0.35rem;
     border-radius: 0.2rem;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .essay {

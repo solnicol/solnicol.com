@@ -3,6 +3,6 @@ import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
 
 export default defineConfig({
-  site: "https://www.solnicol.com",
+  site: "https://solnicol.com",
   integrations: [sitemap(), react()],
 });

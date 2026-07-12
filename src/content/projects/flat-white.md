@@ -7,6 +7,8 @@ year: 2026
 concepts: [latte art, mixing, diffusion]
 ogDescription: Watch a latte-art heart fold, disperse and settle into uniformity
 ogImage: /og-flat-white.jpg
+previewImage: /og-flat-white.jpg
+previewAlt: A latte-art heart floating on coffee in the Flat White experiment
 embed: flat-white
 ---
 

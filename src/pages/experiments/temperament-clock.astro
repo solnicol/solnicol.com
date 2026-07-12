@@ -1,6 +1,11 @@
 ---
 import "@fontsource-variable/geist-mono";
 import TemperamentClock from "../../components/temperament-clock/TemperamentClock.jsx";
+
+const title = "Temperament Clock | Sol Nicol";
+const description = "Hear the gap where twelve pure fifths fail to close";
+const canonical = new URL("/experiments/temperament-clock/", Astro.site);
+const ogImage = new URL("/og-temperament-clock.jpg", Astro.site);
 ---
 
 <!doctype html>
@@ -8,21 +13,33 @@ import TemperamentClock from "../../components/temperament-clock/TemperamentCloc
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Temperament Clock | Sol Nicol</title>
+    <title>{title}</title>
     <meta
       name="description"
-      content="A clock built from the circle of fifths and the Pythagorean comma"
+      content={description}
     />
-    <link rel="canonical" href={new URL("/experiments/temperament-clock/", Astro.site)} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <meta name="theme-color" content="#0e0e0f" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
-    <a class="focus-mark" href="/" aria-label="Sol Nicol — home">
+    <a class="focus-mark" href="/">
       <span>&gt;_S01</span>
       <span>NIC01</span>
+      <span class="visually-hidden">Sol Nicol home</span>
     </a>
     <noscript>
       <p class="noscript">
@@ -58,7 +75,7 @@ import TemperamentClock from "../../components/temperament-clock/TemperamentCloc
     line-height: 1.15;
     font-variant-numeric: tabular-nums;
     text-transform: uppercase;
-    /* Identity, not signal — the mark stays ink, never brass. */
+    /* Identity, not signal - the mark stays ink, never brass. */
     color: oklch(0.7 0.006 95.2);
     text-decoration: none;
     transition: color 160ms ease;
@@ -68,6 +85,18 @@ import TemperamentClock from "../../components/temperament-clock/TemperamentCloc
   .focus-mark:focus-visible {
     color: oklch(0.925 0.007 88.6);
     outline: none;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   @media (max-width: 480px) {
