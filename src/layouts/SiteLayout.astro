@@ -21,7 +21,7 @@ const {
 const siteUrl = Astro.site ?? new URL("https://solnicol.com");
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 const pageTitle = title === "Home"
-  ? "Sol Nicol | Experiments in design and code"
+  ? "Sol Nicol | Making structure visible"
   : `${title} | Sol Nicol`;
 const ogImage = new URL(ogImagePath, siteUrl);
 const baseStructuredData = [
